@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PISA Kids Interactive Learning</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Mali', cursive, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-image: url('img/bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #3b82f6;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 15px;
+        }
+
+        .swal2-popup {
+            font-family: 'Mali', cursive, sans-serif !important;
+            border-radius: 28px !important;
+            border: 4px solid #222222 !important;
+            box-shadow: 8px 8px 0px #222222 !important;
+        }
+        .swal2-title {
+            font-family: 'Mali', cursive, sans-serif !important;
+            font-weight: 800 !important;
+        }
+
+        .top-left-bar {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1002;
+            flex-wrap: wrap;
+        }
+
+        .btn-menu {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 3px solid #ffffff;
+            background: linear-gradient(180deg, #ff7675 0%, #d63031 100%);
+            box-shadow: 0 4px 0 #8b1d1e, 0 6px 12px rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.12s ease;
+        }
+        .btn-menu:hover { transform: translateY(-2px) scale(1.04); }
+        .btn-menu:active { transform: translateY(3px) scale(0.96) !important; }
+
+        .score-hud { display: flex; gap: 8px; align-items: center; }
+
+        .hud-badge {
+            background: rgba(0, 0, 0, 0.65);
+            border: 2.5px solid #ffffff;
+            border-radius: 20px;
+            padding: 4px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-student-tag {
+            background: #10b981;
+            border: 2.5px solid #ffffff;
+            color: #ffffff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s ease;
+        }
+        .btn-student-tag:hover { transform: scale(1.04); background: #059669; }
+
+        .btn-logout {
+            background: #ef4444 !important;
+            display: none;
+        }
+        .btn-logout:hover { background: #dc2626 !important; }
+
+        .top-nav-bar {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 1002;
+        }
+
+        .btn-gold {
+            position: relative;
+            overflow: hidden;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid #ffe57f;
+            background: radial-gradient(circle at 35% 30%, #fff176 0%, #fbc02d 50%, #f57f17 100%);
+            box-shadow: 0 5px 0 #b26a00, 0 8px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.15rem;
+            cursor: pointer;
+            color: #5d3900;
+            font-weight: 800;
+            transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+        }
+        .btn-gold:hover { transform: translateY(-2px); }
+        .btn-gold:active { transform: translateY(4px) scale(0.95) !important; }
+
+        .app-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .brand-logo {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 2px 2px 0px #000;
+            margin-bottom: 10px;
+        }
+        .brand-logo span { color: #ffeb3b; }
+
+        .swipe-hint-badge {
+            background: rgba(0, 0, 0, 0.65);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+            padding: 6px 18px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: bounceHint 1.8s infinite ease-in-out;
+            user-select: none;
+            margin-top: 10px;
+        }
+
+        @keyframes bounceHint {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        .cards-scroll-wrapper {
+            width: 100%;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 20px 15px 15px 15px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .cards-scroll-wrapper::-webkit-scrollbar { display: none; }
+
+        .category-card {
+            position: relative;
+            overflow: hidden;
+            flex: 0 0 280px;
+            height: 380px;
+            border-radius: 36px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 15px 25px 15px;
+            cursor: pointer;
+            scroll-snap-align: center;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
+            border: 4px solid #ffffff;
+            user-select: none;
+        }
+        .category-card:hover { transform: translateY(-8px) scale(1.02); }
+        .category-card:active { transform: translateY(4px) scale(0.97) !important; }
+
+        .card-top-tab {
+            position: absolute;
+            top: -16px;
+            width: 140px;
+            height: 20px;
+            border-radius: 12px 12px 0 0;
+            border: 4px solid #ffffff;
+            border-bottom: none;
+        }
+
+        .card-piti { background: linear-gradient(180deg, #9ae6b4 0%, #68d391 100%); }
+        .card-piti .card-top-tab { background: #48bb78; }
+
+        .card-soon-1 { background: linear-gradient(180deg, #b794f4 0%, #805ad5 100%); opacity: 0.9; }
+        .card-soon-1 .card-top-tab { background: #6b46c1; }
+
+        .card-soon-2 { background: linear-gradient(180deg, #fbd38d 0%, #ed8936 100%); opacity: 0.9; }
+        .card-soon-2 .card-top-tab { background: #dd6b20; }
+
+        .card-illustration {
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .card-illustration img {
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
+            animation: pitiFloat 2.4s infinite ease-in-out;
+            transform-origin: center bottom;
+        }
+
+        @keyframes pitiFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-6px) rotate(-4deg) scale(1.03); }
+            50% { transform: translateY(0) rotate(0deg) scale(1); }
+            75% { transform: translateY(-6px) rotate(4deg) scale(1.03); }
+        }
+
+        .icon-flask {
+            display: inline-block;
+            animation: flaskShake 2.2s infinite ease-in-out;
+            transform-origin: center bottom;
+        }
+
+        @keyframes flaskShake {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            20% { transform: translateY(-4px) rotate(-8deg); }
+            40% { transform: translateY(-2px) rotate(8deg); }
+            60% { transform: translateY(-4px) rotate(-6deg); }
+            80% { transform: translateY(0) rotate(4deg); }
+        }
+
+        .icon-rocket {
+            display: inline-block;
+            animation: rocketFly 2s infinite ease-in-out;
+            transform-origin: center center;
+        }
+
+        @keyframes rocketFly {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-10px) rotate(6deg) scale(1.08); }
+        }
+
+        .card-badge-tag {
+            background: rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+            padding: 8px 24px;
+            border-radius: 25px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            pointer-events: none;
+        }
+
+        .card-number {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            background: #ffffff;
+            color: #222;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            pointer-events: none;
+        }
+
+        .intro-player-container {
+            display: none;
+            width: 100%;
+            max-width: 850px;
+            background: #000000;
+            border-radius: 24px;
+            border: 4px solid #ffffff;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            overflow: hidden;
+            position: relative;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .intro-video {
+            width: 100%;
+            display: block;
+            background: #000;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        @media (min-width: 769px) { .intro-video { aspect-ratio: 16 / 9; } }
+        @media (max-width: 768px) {
+            .intro-player-container { max-width: 360px; border-radius: 20px; }
+            .intro-video { aspect-ratio: 9 / 16; max-height: 75vh; }
+        }
+
+        .quiz-card {
+            display: none;
+            background: #ffffff;
+            color: #222222;
+            width: 100%;
+            max-width: 650px;
+            padding: 30px 24px;
+            border-radius: 28px;
+            border: 4px solid #222222;
+            box-shadow: 10px 10px 0px #222222;
+            position: relative;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .quiz-header { text-align: center; margin-bottom: 15px; }
+
+        .quiz-header .sub-badge {
+            display: inline-block;
+            background: #ff5252;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .quiz-header h2 { font-size: 1.25rem; color: #222; line-height: 1.4; }
+        .quiz-header p { font-size: 0.95rem; color: #666; margin-top: 6px; }
+
+        .tools-btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 12px 0 10px 0;
+        }
+
+        .btn-tool-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            border: 2.5px solid #222;
+            box-shadow: 0 3px 0 #222;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        .btn-tool-pill:hover { transform: scale(1.03); }
+        .btn-tool-pill:active { transform: translateY(3px); box-shadow: 0 0 0 #222; }
+
+        .btn-sim { background: #38bdf8; color: #0f172a; }
+        .btn-cheat { background: #facc15; color: #713f12; }
+
+        .options-grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .options-grid-yesno { display: flex; gap: 16px; margin-top: 20px; }
+
+        .btn-choice {
+            position: relative;
+            overflow: hidden;
+            background: #f8fafc;
+            color: #222;
+            border: 3px solid #222;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #222;
+            transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            width: 100%;
+            user-select: none;
+        }
+        .btn-yes { background: #dcfce7; }
+        .btn-no { background: #fee2e2; }
+        .btn-choice:hover { transform: translateY(-2px); box-shadow: 6px 6px 0px #222; }
+        .btn-choice:active { transform: translate(2px, 2px) scale(0.97) !important; box-shadow: 1px 1px 0 #222 !important; }
+
+        .sim-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.88);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2500;
+            padding: 15px;
+            backdrop-filter: blur(8px);
+        }
+
+        .sim-card {
+            background: #ffffff;
+            color: #1e293b;
+            width: 100%;
+            max-width: 620px;
+            border-radius: 28px;
+            border: 4px solid #0f172a;
+            padding: 24px 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .sim-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #fee2e2;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sim-header-title { font-size: 1.3rem; font-weight: 800; color: #0284c7; margin-bottom: 4px; text-align: center; }
+
+        .room-temp-badge {
+            background: #e2e8f0;
+            border: 2px solid #94a3b8;
+            color: #334155;
+            padding: 3px 14px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .lab-stage {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            background: #f8fafc;
+            border: 3px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 20px 10px;
+            margin-bottom: 20px;
+        }
+
+        .drink-station { display: flex; flex-direction: column; align-items: center; position: relative; flex: 1; }
+        .drink-cup { font-size: 3.5rem; position: relative; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+
+        .heat-arrow { position: absolute; font-size: 1.4rem; font-weight: bold; animation: floatUpDown 1.5s infinite ease-in-out; }
+        .arrow-coffee { top: -20px; color: #ef4444; }
+        .arrow-water { top: -15px; color: #0284c7; animation: floatDownUp 1.5s infinite ease-in-out; }
+
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(-10px); opacity: 0.4; }
+        }
+
+        @keyframes floatDownUp {
+            0%, 100% { transform: translateY(-8px); opacity: 0.4; }
+            50% { transform: translateY(0); opacity: 1; }
+        }
+
+        .drink-name { font-size: 0.95rem; font-weight: 800; margin-top: 5px; }
+
+        .thermometer-wrap { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+
+        .thermometer-tube {
+            width: 16px;
+            height: 90px;
+            background: #e2e8f0;
+            border: 2.5px solid #475569;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .mercury-liquid { width: 100%; transition: height 0.35s ease, background 0.35s ease; }
+        .temp-readout { font-size: 1.2rem; font-weight: 800; }
+
+        .slider-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+        .time-label-box {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .time-slider {
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background: #cbd5e1;
+            outline: none;
+            cursor: pointer;
+            accent-color: #0284c7;
+        }
+
+        .current-time-status { font-size: 1.05rem; font-weight: 800; color: #0369a1; margin-top: 4px; }
+
+        .cheat-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.88);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3500;
+            padding: 15px;
+            backdrop-filter: blur(8px);
+        }
+
+        .cheat-card {
+            background: #ffffff;
+            color: #1e293b;
+            width: 100%;
+            max-width: 640px;
+            max-height: 88vh;
+            border-radius: 28px;
+            border: 4px solid #0f172a;
+            padding: 24px 18px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow-y: auto;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .cheat-title { font-size: 1.35rem; font-weight: 800; color: #d97706; margin-bottom: 12px; text-align: center; }
+
+        .mindmap-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; margin-bottom: 15px; }
+
+        .concept-card { border: 2.5px solid #222; border-radius: 18px; padding: 12px 16px; box-shadow: 3px 3px 0 #222; text-align: left; }
+        .concept-1 { background: #fef08a; }
+        .concept-2 { background: #bbf7d0; }
+        .concept-3 { background: #bae6fd; }
+
+        .concept-header { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.05rem; margin-bottom: 4px; color: #0f172a; }
+        .concept-desc { font-size: 0.88rem; color: #334155; line-height: 1.4; font-weight: 600; }
+
+        .pisa-tip-box {
+            background: #f1f5f9;
+            border-left: 5px solid #0284c7;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #0f172a;
+            width: 100%;
+            line-height: 1.4;
+        }
+
+        .login-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-card {
+            background: #ffffff;
+            color: #1e293b;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 28px;
+            border: 4px solid #0f172a;
+            padding: 30px 24px;
+            box-shadow: 10px 10px 0px #0f172a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            animation: popIn 0.3s ease-out;
+            text-align: center;
+        }
+
+        .login-title { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+
+        .input-group { width: 100%; margin-top: 14px; text-align: left; }
+        .input-group label { font-size: 0.92rem; font-weight: 800; color: #475569; margin-bottom: 5px; display: block; }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 2.5px solid #222;
+            font-size: 1.05rem;
+            font-weight: 700;
+            outline: none;
+            text-align: center;
+            transition: all 0.15s ease;
+        }
+        .input-field:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+        .btn-submit-login {
+            margin-top: 22px;
+            width: 100%;
+            background: #10b981;
+            color: #ffffff;
+            border: 3px solid #222;
+            border-radius: 18px;
+            padding: 12px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #222;
+            transition: all 0.15s ease;
+        }
+        .btn-submit-login:active { transform: translateY(3px); box-shadow: 0 1px 0 #222; }
+
+        .video-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 15px;
+        }
+
+        .video-modal-card {
+            background: #ffffff;
+            color: #222;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 24px;
+            border: 4px solid #222;
+            padding: 20px;
+            box-shadow: 8px 8px 0 #222;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-video-player {
+            width: 100%;
+            border-radius: 16px;
+            border: 3px solid #222;
+            background: #000;
+            aspect-ratio: 16 / 9;
+            margin-bottom: 15px;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .modal-result-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 6px; text-align: center; }
+        .modal-result-title.correct { color: #16a34a; }
+        .modal-result-title.wrong { color: #dc2626; }
+
+        .modal-exp-text {
+            font-size: 0.95rem;
+            color: #475569;
+            line-height: 1.45;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .btn-next-step {
+            position: relative;
+            overflow: hidden;
+            background: #f59e0b;
+            color: #ffffff;
+            border: 3px solid #222;
+            border-radius: 16px;
+            padding: 10px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            box-shadow: 4px 4px 0 #222;
+            cursor: pointer;
+            transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+        }
+        .btn-next-step:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 #222; }
+        .btn-next-step:active { transform: translate(2px, 2px) scale(0.97) !important; box-shadow: 1px 1px 0 #222 !important; }
+
+        .reward-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.88);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+
+        .reward-card {
+            background: #ffffff;
+            color: #222;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 32px;
+            border: 5px solid #222;
+            padding: 30px 20px;
+            box-shadow: 10px 10px 0 #222;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .stars-row {
+            display: flex;
+            gap: 8px;
+            font-size: 3.2rem;
+            margin: 10px 0;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        .star-item { display: inline-block; animation: starPop 0.4s ease forwards; }
+
+        @keyframes starPop {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .reward-badge-title { font-size: 1.45rem; font-weight: 800; color: #d97706; margin-bottom: 4px; }
+
+        .reward-coins-box {
+            background: #fef3c7;
+            border: 3px solid #f59e0b;
+            color: #92400e;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin: 12px 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 0 #d97706;
+        }
+
+        .reward-btns-group { display: flex; gap: 10px; width: 100%; margin-top: 10px; flex-wrap: wrap; }
+
+        .reward-btns-group button {
+            flex: 1;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            border-radius: 16px;
+            border: 3px solid #222;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 #222;
+            transition: all 0.1s ease;
+        }
+
+        .btn-retry-game { background: #60a5fa; color: white; }
+        .btn-home-game { background: #4ade80; color: #14532d; }
+        .btn-summary-game { background: #facc15; color: #713f12; width: 100%; flex: 100%; margin-bottom: 5px; }
+        .btn-send-score { background: #ec4899; color: white; width: 100%; flex: 100%; margin-bottom: 5px; }
+        .reward-btns-group button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #222; }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.55);
+            transform: scale(0);
+            animation: rippleEffect 0.45s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
+
+        @media (max-width: 600px) {
+            .top-left-bar { top: 10px; left: 10px; gap: 6px; }
+            .top-nav-bar { top: 10px; right: 10px; gap: 6px; }
+            .btn-menu { padding: 6px 12px; font-size: 0.85rem; }
+            .hud-badge { padding: 4px 8px; font-size: 0.82rem; }
+            .btn-student-tag { padding: 4px 10px; font-size: 0.8rem; }
+            .btn-gold { width: 40px; height: 40px; font-size: 0.95rem; }
+            .options-grid-4 { grid-template-columns: 1fr; }
+            .quiz-card { padding: 24px 16px; }
+            .brand-logo { font-size: 2.2rem; }
+            .swipe-hint-badge { font-size: 0.82rem; padding: 4px 12px; }
+            .sim-card, .cheat-card, .login-card { padding: 20px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="soundTrue" preload="auto"><source src="sound/true.mp3" type="audio/mpeg"></audio>
+    <audio id="soundFalse" preload="auto"><source src="sound/false.mp3" type="audio/mpeg"></audio>
+
+    <div class="top-left-bar">
+        <a href="index.html" class="btn-menu sound-btn" title="กลับไปหน้ารวมวิชา">
+            <span>📋</span>
+            <span>MENU</span>
+        </a>
+        <div class="score-hud">
+            <div class="hud-badge">⭐ <span id="hudStars">0</span></div>
+        </div>
+        <button id="studentTagBtn" class="btn-student-tag sound-btn" onclick="openLoginModal()">
+            <span>👤</span>
+            <span id="studentNameDisplay">เข้าสู่ระบบ</span>
+        </button>
+        <button id="logoutBtn" class="btn-student-tag btn-logout sound-btn" onclick="logoutStudent()">
+            <span>🚪</span>
+            <span id="logoutText">ออก</span>
+        </button>
+    </div>
+
+    <div class="top-nav-bar">
+        <button id="langToggleBtn" class="btn-gold sound-btn" onclick="toggleLanguage()" title="เปลี่ยนภาษา / Switch Language">TH</button>
+        <button id="homeBtn" class="btn-gold sound-btn" onclick="backToMenu()" title="กลับหน้าเลือกบทเรียน">🏠</button>
+    </div>
+
+    <!-- หน้าเลือกบทเรียน -->
+    <div id="startScreen" class="app-container">
+        <div class="brand-logo">PISA<span>KIDS</span></div>
+
+        <div class="cards-scroll-wrapper">
+            <div class="category-card card-piti sound-btn" onclick="playIntroVideo()">
+                <div class="card-top-tab"></div>
+                <div class="card-number">1</div>
+                <div class="card-illustration">
+                    <img src="img/piti.png" alt="Piti" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'.9em\' font-size=\'90\'>👦</text></svg>'">
+                </div>
+                <div class="card-badge-tag" id="card1Text">ปิติกับอุณหภูมิ</div>
+            </div>
+
+            <div class="category-card card-soon-1 sound-btn" onclick="Swal.fire({ title: currentLang==='th'?'เร็วๆ นี้!':'Coming Soon!', text: currentLang==='th'?'หมวดที่ 2 กำลังพัฒนาครับ':'Lesson 2 is under development.', icon: 'info', confirmButtonText: 'ตกลง', confirmButtonColor: '#3b82f6' })">
+                <div class="card-top-tab"></div>
+                <div class="card-number">2</div>
+                <div class="card-illustration" style="font-size: 4rem;">
+                    <span class="icon-flask">🧪</span>
+                </div>
+                <div class="card-badge-tag" id="card2Text">เร็วๆ นี้ (Soon)</div>
+            </div>
+
+            <div class="category-card card-soon-2 sound-btn" onclick="Swal.fire({ title: currentLang==='th'?'เร็วๆ นี้!':'Coming Soon!', text: currentLang==='th'?'หมวดที่ 3 กำลังพัฒนาครับ':'Lesson 3 is under development.', icon: 'info', confirmButtonText: 'ตกลง', confirmButtonColor: '#3b82f6' })">
+                <div class="card-top-tab"></div>
+                <div class="card-number">3</div>
+                <div class="card-illustration" style="font-size: 4rem;">
+                    <span class="icon-rocket">🚀</span>
+                </div>
+                <div class="card-badge-tag" id="card3Text">เร็วๆ นี้ (Soon)</div>
+            </div>
+        </div>
+
+        <div class="swipe-hint-badge">
+            <span>👈</span>
+            <span id="swipeHintText">ปัดซ้าย-ขวาเพื่อเลือกบทเรียน</span>
+            <span>👉</span>
+        </div>
+    </div>
+
+    <!-- วิดีโอ Intro -->
+    <div id="introPlayerContainer" class="intro-player-container">
+        <video id="introVideo" class="intro-video" playsinline disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
+            <source id="introVideoSrc" src="" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- ข้อคำถามหลัก -->
+    <div id="mainQuizCard" class="quiz-card">
+        <div class="quiz-header">
+            <span class="sub-badge" id="mainBadgeText">คำถามหลัก</span>
+            <h2 id="mainQTitle">ผ่านไป 10 นาที อุณหภูมิของกาแฟและน้ำแร่น่าจะเป็นเท่าใด?</h2>
+            <p id="mainQSubtitle">วางถ้วยไว้ในห้องอุณหภูมิ 20°C (กาแฟเริ่มต้น 90°C / น้ำแร่เริ่มต้น 5°C)</p>
+
+            <div class="tools-btn-row">
+                <button class="btn-tool-pill btn-sim sound-btn" onclick="openSimModal()">
+                    <span>🧪</span>
+                    <span id="btnSimText">ห้องทดลองจำลอง</span>
+                </button>
+                <button class="btn-tool-pill btn-cheat sound-btn" onclick="openCheatModal()">
+                    <span>📖</span>
+                    <span id="btnCheatText">สรุปความรู้</span>
+                </button>
+            </div>
+        </div>
+        <div class="options-grid-4">
+            <button class="btn-choice sound-btn" id="optA" onclick="selectMainChoice('A')">ก) 70°C และ 10°C</button>
+            <button class="btn-choice sound-btn" id="optB" onclick="selectMainChoice('B')">ข) 90°C และ 5°C</button>
+            <button class="btn-choice sound-btn" id="optC" onclick="selectMainChoice('C')">ค) 70°C และ 25°C</button>
+            <button class="btn-choice sound-btn" id="optD" onclick="selectMainChoice('D')">ง) 20°C และ 20°C</button>
+        </div>
+    </div>
+
+    <!-- ข้อคำถามย่อย -->
+    <div id="subQuizCard" class="quiz-card">
+        <div class="quiz-header">
+            <span class="sub-badge" id="subBadgeText">ข้อคำถามย่อย</span>
+            <p id="subTopicIntro" style="color: #ea580c; font-weight: bold; margin-bottom: 8px;"></p>
+            <h2 id="subQuestionText"></h2>
+
+            <div class="tools-btn-row">
+                <button class="btn-tool-pill btn-sim sound-btn" onclick="openSimModal()">
+                    <span>🧪</span>
+                    <span id="subBtnSimText">ห้องทดลองจำลอง</span>
+                </button>
+                <button class="btn-tool-pill btn-cheat sound-btn" onclick="openCheatModal()">
+                    <span>📖</span>
+                    <span id="subBtnCheatText">สรุปความรู้</span>
+                </button>
+            </div>
+        </div>
+        <div class="options-grid-yesno">
+            <button class="btn-choice btn-yes sound-btn" id="btnYes" onclick="answerSubQuestion(true)">👍 ใช่</button>
+            <button class="btn-choice btn-no sound-btn" id="btnNo" onclick="answerSubQuestion(false)">👎 ไม่ใช่</button>
+        </div>
+    </div>
+
+    <!-- Simulation Modal -->
+    <div id="simModal" class="sim-modal-overlay">
+        <div class="sim-card">
+            <button class="sim-close-btn sound-btn" onclick="closeSimModal()">✕</button>
+            <h3 class="sim-header-title" id="simTitle">🧪 ห้องทดลองจำลองการถ่ายโอนความร้อน</h3>
+            <div class="room-temp-badge" id="simRoomBadge">🏠 อุณหภูมิห้องโดยรอบ: 20°C</div>
+
+            <div class="lab-stage">
+                <div class="drink-station">
+                    <div class="drink-cup">
+                        ☕
+                        <div class="heat-arrow arrow-coffee" id="coffeeHeatIcon">🔥⬆️</div>
+                    </div>
+                    <div class="drink-name" id="simCoffeeName" style="color: #c2410c;">กาแฟร้อน</div>
+                    <div class="thermometer-wrap">
+                        <div class="thermometer-tube">
+                            <div id="coffeeMercury" class="mercury-liquid" style="height: 90%; background: #ef4444;"></div>
+                        </div>
+                        <div id="coffeeTempDisplay" class="temp-readout" style="color: #ef4444;">90°C</div>
+                    </div>
+                </div>
+
+                <div class="drink-station">
+                    <div class="drink-cup">
+                        🧊🥤
+                        <div class="heat-arrow arrow-water" id="waterHeatIcon">❄️⬇️</div>
+                    </div>
+                    <div class="drink-name" id="simWaterName" style="color: #0369a1;">น้ำแร่เย็น</div>
+                    <div class="thermometer-wrap">
+                        <div class="thermometer-tube">
+                            <div id="waterMercury" class="mercury-liquid" style="height: 10%; background: #38bdf8;"></div>
+                        </div>
+                        <div id="waterTempDisplay" class="temp-readout" style="color: #0284c7;">5°C</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slider-section">
+                <div class="time-label-box">
+                    <span id="sliderStart">0 นาที (เริ่มต้น)</span>
+                    <span id="sliderMid">10 นาที</span>
+                    <span id="sliderEnd">30 นาที (สมดุล)</span>
+                </div>
+                <input type="range" id="timeRangeSlider" class="time-slider" min="0" max="30" value="0" step="1" oninput="updateSimulationTime(this.value)">
+                <div id="timeStatusText" class="current-time-status">⏱️ เวลาผ่านไป: 0 นาที</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cheat Sheet Modal -->
+    <div id="cheatModal" class="cheat-modal-overlay">
+        <div class="cheat-card">
+            <button class="sim-close-btn sound-btn" onclick="closeCheatModal()">✕</button>
+            <h3 class="cheat-title" id="cheatHeaderTitle">📊 สรุปความรู้: การถ่ายโอนความร้อน</h3>
+
+            <div class="mindmap-grid">
+                <div class="concept-card concept-1">
+                    <div class="concept-header">
+                        <span id="c1Title">🔥 1. ทิศทางการถ่ายโอนความร้อน</span>
+                    </div>
+                    <div class="concept-desc" id="c1Desc">
+                        ความร้อนจะเคลื่อนที่จากบริเวณที่มี <strong>อุณหภูมิสูง ➔ อุณหภูมิต่ำ</strong> เสมอจนกว่าจะเท่ากัน (กาแฟร้อนคายความร้อนสู่อากาศ / น้ำแร่เย็นรับความร้อนจากอากาศ)
+                    </div>
+                </div>
+
+                <div class="concept-card concept-2">
+                    <div class="concept-header">
+                        <span id="c2Title">⚖️ 2. สมดุลความร้อน (Thermal Equilibrium)</span>
+                    </div>
+                    <div class="concept-desc" id="c2Desc">
+                        คือสภาวะที่วัตถุและสิ่งแวดล้อมมี <strong>อุณหภูมิเท่ากันพอดี (20°C)</strong> และไม่มีการถ่ายโอนความร้อนสุทธิระหว่างกันอีก
+                    </div>
+                </div>
+
+                <div class="concept-card concept-3">
+                    <div class="concept-header">
+                        <span id="c3Title">⏳ 3. กฎการเย็นตัวของนิวตัน & ปัจจัยเวลา</span>
+                    </div>
+                    <div class="concept-desc" id="c3Desc">
+                        การปรับอุณหภูมิต้อง <strong>ใช้เวลา</strong> โดยช่วงแรกที่อุณหภูมิต่างกันมากจะเปลี่ยนเร็ว และจะค่อยๆ ช้าลงเมื่อใกล้เคียงอุณหภูมิห้อง (เวลา 10 นาทียังไม่พอที่จะถึง 20°C)
+                    </div>
+                </div>
+            </div>
+
+            <div class="pisa-tip-box" id="pisaTipBox">
+                💡 <strong>ข้อสังเกต PISA:</strong> น้ำแร่ (5°C) วางในห้อง (20°C) อุณหภูมิจะ <u>ไม่มีทางสูงเกิน 20°C ไปเป็น 25°C</u> ได้เองตามธรรมชาติเด็ดขาด!
+            </div>
+        </div>
+    </div>
+
+    <!-- 👤 Modal บังคับล็อกอิน (ไม่มีปุ่มกากบาท) -->
+    <div id="loginModal" class="login-modal-overlay">
+        <div class="login-card">
+            <h3 class="login-title" id="loginModalTitle">🔑 เข้าสู่ระบบผู้เรียน</h3>
+            <p style="font-size: 0.88rem; color: #64748b; margin-top: 4px;" id="loginModalSubtitle">กรุณากรอกรหัสนักเรียนเพื่อเข้าสู่บทเรียน</p>
+
+            <div class="input-group">
+                <label for="inpStudentId" id="lblStudentId">รหัสนักเรียน (Student ID):</label>
+                <input type="text" id="inpStudentId" class="input-field" placeholder="เช่น 31216" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label for="inpStudentClass" id="lblStudentClass">ระดับชั้น / ห้อง (Class):</label>
+                <input type="text" id="inpStudentClass" class="input-field" placeholder="เช่น ม.1/5 หรือ ป.6" autocomplete="off">
+            </div>
+
+            <button id="btnLoginSubmit" class="btn-submit-login sound-btn" onclick="loginWithStudentId()">เข้าสู่ระบบ 🚀</button>
+        </div>
+    </div>
+
+    <!-- Modal เฉลยวิดีโอ -->
+    <div id="videoModal" class="video-modal-overlay">
+        <div class="video-modal-card">
+            <video id="modalVideo" class="modal-video-player" playsinline disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
+                <source id="modalVideoSrc" src="" type="video/mp4">
+            </video>
+            <div id="modalTitle" class="modal-result-title"></div>
+            <p id="modalExp" class="modal-exp-text"></p>
+            <button id="modalActionBtn" class="btn-next-step sound-btn" onclick="handleModalNext()">ถัดไป ➡️</button>
+        </div>
+    </div>
+
+    <!-- Modal รับรางวัล & แลกคะแนน -->
+    <div id="rewardModal" class="reward-modal-overlay">
+        <div class="reward-card">
+            <h3 class="reward-badge-title" id="rewardTitle">🎉 ยอดเยี่ยมมาก!</h3>
+            <div class="stars-row" id="rewardStarsRow"></div>
+            <p id="rewardSubtitle" style="color: #4b5563; font-size: 0.95rem; font-weight: 600;"></p>
+
+            <div class="reward-coins-box">
+                <span id="rewardCoinsLabel">ดาวสะสมรวม:</span>
+                <span id="rewardCoinsEarned">0 ⭐</span>
+            </div>
+
+            <div class="reward-btns-group">
+                <button class="btn-send-score sound-btn" id="btnSendScore" onclick="redeemStarsToSheet()">🎁 แลกคะแนน (อัปเดต Google Sheet)</button>
+                <button class="btn-summary-game sound-btn" id="btnRewardSummary" onclick="openCheatModal()">📖 ทบทวนสรุปความรู้</button>
+                <button class="btn-retry-game sound-btn" id="btnRewardRetry" onclick="retryThisLesson()">🔄 เล่นอีกครั้ง</button>
+                <button class="btn-home-game sound-btn" id="btnRewardHome" onclick="closeRewardToHome()">🏠 เมนูหลัก</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfA4fKhF8ROV4y_TcTbiGJdi9Ei_OJN8iTSGgr_E6r2kWzjma0_VmG5uU3BSz1mKNjpg/exec";
+
+    let currentStudentId = localStorage.getItem('pisa_current_student_id') || '';
+    let currentStudentClass = localStorage.getItem('pisa_current_student_class') || '';
+    let userStars = parseInt(localStorage.getItem('pisa_stars') || '0', 10);
+    let firstTryCorrect = false;
+
+    // ============================================================
+    // 🛡️ ระบบตรวจจับการสลับจอ (ส่งบันทึกลงช่อง E โดยเฉพาะ)
+    // ============================================================
+    let tabSwitchCount = 0;
+
+    function reportTabSwitchToSheet(count) {
+        if (!currentStudentId) return;
+
+        const formData = new URLSearchParams();
+        formData.append("studentId", currentStudentId);
+        formData.append("studentClass", currentStudentClass || "-");
+        formData.append("stars", userStars);
+        formData.append("tabSwitchCount", count); // ส่งตรงเข้าช่อง E
+
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        }).catch(err => console.error("Log error:", err));
+    }
+
+    // 1. ตรวจจับการสลับแท็บ ย่อเบราว์เซอร์ หรือสลับแอป
+    document.addEventListener("visibilitychange", function() {
+        if (document.hidden) {
+            // ทำงานเฉพาะตอนเริ่มทำคำถาม
+            if (mainQuizCard.style.display === 'block' || subQuizCard.style.display === 'block') {
+                tabSwitchCount++;
+
+                // บันทึกจำนวนครั้งที่สลับหน้าจอลง Google Sheet ทันที
+                reportTabSwitchToSheet(tabSwitchCount);
+
+                // ป๊อปอัปแจ้งเตือน เน้นข้อความตัวแดงหนาทึบ เด่นชัด มีเว้นวรรค
+                Swal.fire({
+                    title: '⚠️ คำเตือน',
+                    html: `
+                        <div style="font-size: 1.05rem; line-height: 1.8; color: #334155;">
+                            กรุณาทำแบบทดสอบด้วยตนเอง
+                            <br><br>
+                            <span style="color: #dc2626; font-weight: 800; font-size: 1.25rem; display: inline-block; padding: 6px 12px; background: #fee2e2; border-radius: 12px; border: 2.5px solid #ef4444;">
+                                🚫 ห้ามเปิดเว็บค้นหาคำตอบ หรือ แคปหน้าจอ
+                            </span>
+                            <br><br>
+                            ระบบสามารถตรวจสอบการบันทึกหน้าจอได้ 🔎
+                            <br><br>
+                            <span style="font-size: 0.95rem; color: #64748b; font-weight: 600;">กรุณาทำข้อสอบให้เสร็จด้วยตนเอง</span>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    confirmButtonText: 'ทำข้อสอบต่อ ✍️',
+                    confirmButtonColor: '#3b82f6',
+                    allowOutsideClick: false
+                });
+            }
+        }
+    });
+
+    // 2. บล็อกการคลิกขวา
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // 3. บล็อกการคัดลอก, ตัด และวางข้อความ
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('cut', e => e.preventDefault());
+    document.addEventListener('paste', e => e.preventDefault());
+
+    // 4. บล็อกคีย์ลัดสำหรับเปิด Inspect (F12) และดูโค้ด
+    document.addEventListener('keydown', function(e) {
+        if (
+            e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
+            (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V'))
+        ) {
+            e.preventDefault();
+        }
+    });
+
+    // ==========================================
+    // 🛡️ ระบบล็อกอิน & จัดการข้อมูลผู้เรียน
+    // ==========================================
+    function checkAuthStatus() {
+        if (!currentStudentId) {
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('logoutBtn').style.display = 'none';
+        } else {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'flex';
+            updateStudentDisplay();
+        }
+    }
+
+    function updateStudentDisplay() {
+        const nameDisplay = document.getElementById('studentNameDisplay');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const studentTagBtn = document.getElementById('studentTagBtn');
+        const logoutText = document.getElementById('logoutText');
+
+        if (currentStudentId) {
+            nameDisplay.innerText = `${currentStudentId} (${currentStudentClass || '-'})`;
+            studentTagBtn.style.background = "#0284c7";
+            logoutBtn.style.display = "flex";
+        } else {
+            nameDisplay.innerText = currentLang === 'th' ? "เข้าสู่ระบบ" : "Login";
+            studentTagBtn.style.background = "#10b981";
+            logoutBtn.style.display = "none";
+        }
+        if (logoutText) {
+            logoutText.innerText = currentLang === 'th' ? "ออก" : "Logout";
+        }
+        document.getElementById('hudStars').innerText = userStars;
+    }
+
+    function openLoginModal() {
+        document.getElementById('inpStudentId').value = currentStudentId;
+        document.getElementById('inpStudentClass').value = currentStudentClass;
+        document.getElementById('loginModal').style.display = 'flex';
+    }
+
+    async function loginWithStudentId() {
+        const idInput = document.getElementById('inpStudentId').value.trim();
+        const classInput = document.getElementById('inpStudentClass').value.trim() || "-";
+
+        if (!idInput) {
+            Swal.fire({
+                title: currentLang === 'th' ? 'กรุณากรอกรหัส' : 'Missing ID',
+                text: currentLang === 'th' ? 'กรุณากรอกรหัสนักเรียนก่อนเข้าใช้งานครับ' : 'Please enter your student ID.',
+                icon: 'warning',
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: '#f59e0b'
+            });
+            return;
+        }
+
+        const btnLogin = document.getElementById('btnLoginSubmit');
+        btnLogin.innerText = currentLang === 'th' ? "⏳ กำลังดึงข้อมูล..." : "⏳ Fetching...";
+        btnLogin.disabled = true;
+
+        try {
+            const response = await fetch(`${GOOGLE_SCRIPT_URL}?studentId=${encodeURIComponent(idInput)}&studentClass=${encodeURIComponent(classInput)}`);
+            const res = await response.json();
+
+            if (res.status === 'success') {
+                currentStudentId = res.studentId;
+                currentStudentClass = (res.studentClass && res.studentClass !== "-") ? res.studentClass : classInput;
+                userStars = parseInt(res.stars, 10) || 0;
+
+                localStorage.setItem('pisa_current_student_id', currentStudentId);
+                localStorage.setItem('pisa_current_student_class', currentStudentClass);
+                localStorage.setItem('pisa_stars', userStars);
+
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'flex';
+                updateStudentDisplay();
+
+                Swal.fire({
+                    title: currentLang === 'th' ? '🎉 ยินดีต้อนรับ!' : '🎉 Welcome!',
+                    html: currentLang === 'th' 
+                        ? `รหัส <b>${currentStudentId}</b> (ห้อง <b>${currentStudentClass}</b>)<br>มีดาวสะสม: <span style="color: #d97706; font-size: 1.25rem; font-weight: bold;">${userStars} ⭐</span>`
+                        : `Student ID: <b>${currentStudentId}</b> (Room <b>${currentStudentClass}</b>)<br>Current Stars: <span style="color: #d97706; font-size: 1.25rem; font-weight: bold;">${userStars} ⭐</span>`,
+                    icon: 'success',
+                    confirmButtonText: 'เริ่มเรียนรู้เลย 🚀',
+                    confirmButtonColor: '#10b981'
+                });
+            } else {
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาด',
+                    text: res.message,
+                    icon: 'error',
+                    confirmButtonText: 'ลองใหม่อีกครั้ง',
+                    confirmButtonColor: '#ef4444'
+                });
+            }
+        } catch (err) {
+            currentStudentId = idInput;
+            currentStudentClass = classInput;
+            localStorage.setItem('pisa_current_student_id', currentStudentId);
+            localStorage.setItem('pisa_current_student_class', currentStudentClass);
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'flex';
+            updateStudentDisplay();
+
+            Swal.fire({
+                title: 'เข้าสู่ระบบ (โหมดออฟไลน์)',
+                html: `รหัส <b>${currentStudentId}</b> (ห้อง <b>${currentStudentClass}</b>)`,
+                icon: 'info',
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: '#3b82f6'
+            });
+        } finally {
+            btnLogin.innerText = currentLang === 'th' ? "เข้าสู่ระบบ 🚀" : "Login 🚀";
+            btnLogin.disabled = false;
+        }
+    }
+
+    function logoutStudent() {
+        Swal.fire({
+            title: currentLang === 'th' ? 'ต้องการออกจากระบบหรือไม่?' : 'Are you sure you want to log out?',
+            text: currentLang === 'th' ? 'ระบบจะนำคุณกลับไปหน้าล็อกอิน' : 'You will be returned to login screen.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: currentLang === 'th' ? '🚪 ออกจากระบบ' : 'Log out',
+            cancelButtonText: currentLang === 'th' ? 'ยกเลิก' : 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                currentStudentId = '';
+                currentStudentClass = '';
+                userStars = 0;
+                localStorage.removeItem('pisa_current_student_id');
+                localStorage.removeItem('pisa_current_student_class');
+                localStorage.removeItem('pisa_stars');
+                localStorage.removeItem('pisa_lesson_1_temp_claimed');
+                
+                updateStudentDisplay();
+                checkAuthStatus();
+            }
+        });
+    }
+
+    function redeemStarsToSheet() {
+        if (!currentStudentId) {
+            Swal.fire({
+                title: currentLang === 'th' ? 'กรุณาเข้าสู่ระบบ' : 'Please Log in',
+                text: currentLang === 'th' ? 'กรุณาเข้าสู่ระบบด้วยรหัสนักเรียนก่อนแลกคะแนนครับ' : 'Please log in with student ID first.',
+                icon: 'warning',
+                confirmButtonText: 'เข้าสู่ระบบ',
+                confirmButtonColor: '#10b981'
+            }).then(() => openLoginModal());
+            return;
+        }
+
+        const btnSend = document.getElementById('btnSendScore');
+        btnSend.innerText = currentLang === 'th' ? "⏳ กำลังอัปเดต Sheet..." : "⏳ Updating Sheet...";
+        btnSend.disabled = true;
+
+        const formData = new URLSearchParams();
+        formData.append("studentId", currentStudentId);
+        formData.append("studentClass", currentStudentClass || "-");
+        formData.append("stars", userStars);
+        formData.append("status", "แลกคะแนนเรียบร้อยแล้ว (" + userStars + " ดาว)");
+        formData.append("tabSwitchCount", tabSwitchCount); // แนบจำนวนครั้งสลับจอไปด้วยเพื่อไม่ให้ช่อง E ว่าง
+
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        })
+        .then(() => {
+            btnSend.innerText = currentLang === 'th' ? "✅ แลกคะแนนสำเร็จแล้ว!" : "✅ Redeemed Successfully!";
+            
+            Swal.fire({
+                title: currentLang === 'th' ? '🎉 แลกคะแนนสำเร็จ!' : '🎉 Redeemed Successfully!',
+                html: currentLang === 'th'
+                    ? `อัปเดตคะแนนดาว (<b>${userStars} ⭐</b>)<br>ของรหัส <b>${currentStudentId}</b> (ห้อง ${currentStudentClass})<br>ลง Google Sheet เรียบร้อยแล้วครับ!`
+                    : `Updated <b>${userStars} ⭐</b> for ID <b>${currentStudentId}</b> (Room ${currentStudentClass}) to Google Sheet!`,
+                icon: 'success',
+                confirmButtonText: 'ยอดเยี่ยม 👍',
+                confirmButtonColor: '#10b981'
+            });
+        })
+        .catch(err => {
+            btnSend.innerText = currentLang === 'th' ? "❌ เกิดข้อผิดพลาด" : "❌ Error";
+            btnSend.disabled = false;
+            
+            Swal.fire({
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถเชื่อมต่อได้: ' + err,
+                icon: 'error',
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: '#ef4444'
+            });
+        });
+    }
+
+    let currentLang = 'th';
+
+    const langData = {
+        th: {
+            langBtn: "TH",
+            card1: "ปิติกับอุณหภูมิ",
+            card2: "เร็วๆ นี้ (Soon)",
+            card3: "เร็วๆ นี้ (Soon)",
+            swipeHint: "ปัดซ้าย-ขวาเพื่อเลือกบทเรียน",
+            mainBadge: "คำถามหลัก",
+            mainQTitle: "ผ่านไป 10 นาที อุณหภูมิของกาแฟและน้ำแร่น่าจะเป็นเท่าใด?",
+            mainQSubtitle: "วางถ้วยไว้ในห้องอุณหภูมิ 20°C (กาแฟเริ่มต้น 90°C / น้ำแร่เริ่มต้น 5°C)",
+            btnSim: "ห้องทดลองจำลอง",
+            btnCheat: "สรุปความรู้",
+            optA: "ก) 70°C และ 10°C",
+            optB: "ข) 90°C และ 5°C",
+            optC: "ค) 70°C และ 25°C",
+            optD: "ง) 20°C และ 20°C",
+            subBadge: "ข้อคำถามย่อย",
+            btnYes: "👍 ใช่",
+            btnNo: "👎 ไม่ใช่",
+            simTitle: "🧪 ห้องทดลองจำลองการถ่ายโอนความร้อน",
+            simRoomBadge: "🏠 อุณหภูมิห้องโดยรอบ: 20°C",
+            simCoffeeName: "กาแฟร้อน",
+            simWaterName: "น้ำแร่เย็น",
+            sliderStart: "0 นาที (เริ่มต้น)",
+            sliderMid: "10 นาที",
+            sliderEnd: "30 นาที (สมดุล)",
+            timeStatus: "⏱️ เวลาผ่านไป: {min} นาที",
+            cheatHeaderTitle: "📊 สรุปความรู้: การถ่ายโอนความร้อน",
+            c1Title: "🔥 1. ทิศทางการถ่ายโอนความร้อน",
+            c1Desc: "ความร้อนจะเคลื่อนที่จากบริเวณที่มี <strong>อุณหภูมิสูง ➔ อุณหภูมิต่ำ</strong> เสมอจนกว่าจะเท่ากัน (กาแฟร้อนคายความร้อนสู่อากาศ / น้ำแร่เย็นรับความร้อนจากอากาศ)",
+            c2Title: "⚖️ 2. สมดุลความร้อน (Thermal Equilibrium)",
+            c2Desc: "คือสภาวะที่วัตถุและสิ่งแวดล้อมมี <strong>อุณหภูมิเท่ากันพอดี (20°C)</strong> และไม่มีการถ่ายโอนความร้อนสุทธิระหว่างกันอีก",
+            c3Title: "⏳ 3. กฎการเย็นตัวของนิวตัน & ปัจจัยเวลา",
+            c3Desc: "การปรับอุณหภูมิต้อง <strong>ใช้เวลา</strong> โดยช่วงแรกที่อุณหภูมิต่างกันมากจะเปลี่ยนเร็ว และจะค่อยๆ ช้าลงเมื่อใกล้เคียงอุณหภูมิห้อง (เวลา 10 นาทียังไม่พอที่จะถึง 20°C)",
+            pisaTip: "💡 <strong>ข้อสังเกต PISA:</strong> น้ำแร่ (5°C) วางในห้อง (20°C) อุณหภูมิจะ <u>ไม่มีทางสูงเกิน 20°C ไปเป็น 25°C</u> ได้เองตามธรรมชาติเด็ดขาด!",
+            btnSendScore: "🎁 แลกคะแนน (อัปเดต Google Sheet)",
+            btnRewardSummary: "📖 ทบทวนสรุปความรู้",
+            btnRewardRetry: "🔄 เล่นอีกครั้ง",
+            btnRewardHome: "🏠 เมนูหลัก",
+            rewardPerfectTitle: "🏆 อัจฉริยะวิทยาศาสตร์!",
+            rewardPerfectSub: "ยอดเยี่ยมมาก! คุณตอบคำถามหลักถูกต้องตั้งแต่รอบแรก",
+            rewardEffortTitle: "🌟 นักสืบวิทยาศาสตร์ยอดพยายาม!",
+            rewardEffortSub: "เก่งมาก! คุณผ่านการคิดวิเคราะห์ข้อย่อยจนเข้าใจเนื้อหา",
+            rewardCoinsLabel: "ดาวสะสมรวม:"
+        },
+        en: {
+            langBtn: "EN",
+            card1: "Piti & Temperature",
+            card2: "Coming Soon",
+            card3: "Coming Soon",
+            swipeHint: "Swipe left-right to choose lessons",
+            mainBadge: "Main Question",
+            mainQTitle: "After 10 minutes, what would be the temperature of coffee and water?",
+            mainQSubtitle: "Placed in a 20°C room (Coffee started at 90°C / Water started at 5°C)",
+            btnSim: "Virtual Lab Sim",
+            btnCheat: "Summary",
+            optA: "A) 70°C and 10°C",
+            optB: "B) 90°C and 5°C",
+            optC: "C) 70°C and 25°C",
+            optD: "D) 20°C and 20°C",
+            subBadge: "Sub-Question",
+            btnYes: "👍 Yes",
+            btnNo: "👎 No",
+            simTitle: "🧪 Thermal Energy Transfer Simulation",
+            simRoomBadge: "🏠 Room Temperature: 20°C",
+            simCoffeeName: "Hot Coffee",
+            simWaterName: "Cold Mineral Water",
+            sliderStart: "0 min (Start)",
+            sliderMid: "10 min",
+            sliderEnd: "30 min (Equilibrium)",
+            timeStatus: "⏱️ Time Elapsed: {min} minutes",
+            cheatHeaderTitle: "📊 Knowledge Summary: Heat Transfer",
+            c1Title: "🔥 1. Direction of Heat Transfer",
+            c1Desc: "Thermal energy always transfers from <strong>Higher ➔ Lower temperature</strong> until balanced (Coffee cools into air / Water absorbs heat from air).",
+            c2Title: "⚖️ 2. Thermal Equilibrium",
+            c2Desc: "A condition where objects and environment reach <strong>the exact same temperature (20°C)</strong> and net heat transfer becomes zero.",
+            c3Title: "⏳ 3. Newton's Cooling Law & Time Factor",
+            c3Desc: "Temperature change <strong>takes time</strong>. Rate is faster initially and slows down near room temp (10 minutes is not enough to reach 20°C).",
+            pisaTip: "💡 <strong>PISA Insight:</strong> Cold water (5°C) in a 20°C room can <u>never exceed room temperature to reach 25°C</u> naturally!",
+            btnSendScore: "🎁 Redeem Stars (Update Sheet)",
+            btnRewardSummary: "📖 Review Knowledge",
+            btnRewardRetry: "🔄 Play Again",
+            btnRewardHome: "🏠 Main Menu",
+            rewardPerfectTitle: "🏆 Science Genius!",
+            rewardPerfectSub: "Outstanding! You got the correct answer on the very first try.",
+            rewardEffortTitle: "🌟 Determined Investigator!",
+            rewardEffortSub: "Great job! You analyzed the sub-questions and understood the concepts.",
+            rewardCoinsLabel: "Total Stars:"
+        }
+    };
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'th' ? 'en' : 'th';
+        applyLanguage();
+    }
+
+    function applyLanguage() {
+        const t = langData[currentLang];
+        document.getElementById('langToggleBtn').innerText = t.langBtn;
+        document.getElementById('card1Text').innerText = t.card1;
+        document.getElementById('card2Text').innerText = t.card2;
+        document.getElementById('card3Text').innerText = t.card3;
+        document.getElementById('swipeHintText').innerText = t.swipeHint;
+
+        document.getElementById('mainBadgeText').innerText = t.mainBadge;
+        document.getElementById('mainQTitle').innerText = t.mainQTitle;
+        document.getElementById('mainQSubtitle').innerText = t.mainQSubtitle;
+        document.getElementById('btnSimText').innerText = t.btnSim;
+        document.getElementById('btnCheatText').innerText = t.btnCheat;
+        document.getElementById('subBtnSimText').innerText = t.btnSim;
+        document.getElementById('subBtnCheatText').innerText = t.btnCheat;
+
+        document.getElementById('optA').innerText = t.optA;
+        document.getElementById('optB').innerText = t.optB;
+        document.getElementById('optC').innerText = t.optC;
+        document.getElementById('optD').innerText = t.optD;
+
+        document.getElementById('subBadgeText').innerText = t.subBadge;
+        document.getElementById('btnYes').innerText = t.btnYes;
+        document.getElementById('btnNo').innerText = t.btnNo;
+
+        document.getElementById('simTitle').innerText = t.simTitle;
+        document.getElementById('simRoomBadge').innerText = t.simRoomBadge;
+        document.getElementById('simCoffeeName').innerText = t.simCoffeeName;
+        document.getElementById('simWaterName').innerText = t.simWaterName;
+        document.getElementById('sliderStart').innerText = t.sliderStart;
+        document.getElementById('sliderMid').innerText = t.sliderMid;
+        document.getElementById('sliderEnd').innerText = t.sliderEnd;
+        updateSimulationTime(document.getElementById('timeRangeSlider').value);
+
+        document.getElementById('cheatHeaderTitle').innerText = t.cheatHeaderTitle;
+        document.getElementById('c1Title').innerText = t.c1Title;
+        document.getElementById('c1Desc').innerHTML = t.c1Desc;
+        document.getElementById('c2Title').innerText = t.c2Title;
+        document.getElementById('c2Desc').innerHTML = t.c2Desc;
+        document.getElementById('c3Title').innerText = t.c3Title;
+        document.getElementById('c3Desc').innerHTML = t.c3Desc;
+        document.getElementById('pisaTipBox').innerHTML = t.pisaTip;
+
+        document.getElementById('btnSendScore').innerText = t.btnSendScore;
+        document.getElementById('btnRewardSummary').innerText = t.btnRewardSummary;
+        document.getElementById('btnRewardRetry').innerText = t.btnRewardRetry;
+        document.getElementById('btnRewardHome').innerText = t.btnRewardHome;
+        document.getElementById('rewardCoinsLabel').innerText = t.rewardCoinsLabel;
+
+        updateStudentDisplay();
+        if (subQuizCard.style.display === 'block') renderSubQuestion();
+    }
+
+    const cheatModal = document.getElementById('cheatModal');
+    function openCheatModal() { cheatModal.style.display = 'flex'; }
+    function closeCheatModal() { cheatModal.style.display = 'none'; }
+
+    const simModal = document.getElementById('simModal');
+    const coffeeMercury = document.getElementById('coffeeMercury');
+    const waterMercury = document.getElementById('waterMercury');
+    const coffeeTempDisplay = document.getElementById('coffeeTempDisplay');
+    const waterTempDisplay = document.getElementById('waterTempDisplay');
+    const timeStatusText = document.getElementById('timeStatusText');
+    const coffeeHeatIcon = document.getElementById('coffeeHeatIcon');
+    const waterHeatIcon = document.getElementById('waterHeatIcon');
+
+    function openSimModal() { simModal.style.display = 'flex'; }
+    function closeSimModal() { simModal.style.display = 'none'; }
+
+    function updateSimulationTime(minutes) {
+        minutes = parseInt(minutes, 10);
+        const t = langData[currentLang];
+        timeStatusText.innerText = t.timeStatus.replace('{min}', minutes);
+
+        let coffeeTemp = Math.round(20 + 70 * Math.exp(-0.04 * minutes));
+        let waterTemp = Math.round(20 - 15 * Math.exp(-0.04 * minutes));
+
+        if (minutes === 10) { coffeeTemp = 70; waterTemp = 10; }
+        else if (minutes >= 28) { coffeeTemp = 20; waterTemp = 20; }
+
+        coffeeTempDisplay.innerText = `${coffeeTemp}°C`;
+        waterTempDisplay.innerText = `${waterTemp}°C`;
+        coffeeMercury.style.height = `${coffeeTemp}%`;
+        waterMercury.style.height = `${waterTemp}%`;
+
+        if (coffeeTemp > 50) { coffeeMercury.style.background = '#ef4444'; coffeeHeatIcon.innerText = '🔥⬆️'; }
+        else if (coffeeTemp > 25) { coffeeMercury.style.background = '#f97316'; coffeeHeatIcon.innerText = '♨️⬆️'; }
+        else { coffeeMercury.style.background = '#22c55e'; coffeeHeatIcon.innerText = currentLang === 'th' ? '✅ สมดุล' : '✅ Balanced'; }
+
+        if (waterTemp < 15) { waterMercury.style.background = '#38bdf8'; waterHeatIcon.innerText = '❄️⬇️'; }
+        else if (waterTemp < 20) { waterMercury.style.background = '#60a5fa'; waterHeatIcon.innerText = '💧⬇️'; }
+        else { waterMercury.style.background = '#22c55e'; waterHeatIcon.innerText = currentLang === 'th' ? '✅ สมดุล' : '✅ Balanced'; }
+    }
+
+    const LESSON_ID = 'pisa_lesson_1_temp';
+
+    function showRewardModal(isFirstTry) {
+        const t = langData[currentLang];
+        const rewardModal = document.getElementById('rewardModal');
+        const rewardTitle = document.getElementById('rewardTitle');
+        const rewardStarsRow = document.getElementById('rewardStarsRow');
+        const rewardSubtitle = document.getElementById('rewardSubtitle');
+        const rewardCoinsEarned = document.getElementById('rewardCoinsEarned');
+
+        const alreadyClaimed = localStorage.getItem(LESSON_ID + '_claimed');
+
+        if (isFirstTry) {
+            rewardTitle.innerText = t.rewardPerfectTitle;
+            rewardStarsRow.innerHTML = `
+                <span class="star-item" style="animation-delay: 0.1s;">⭐</span>
+                <span class="star-item" style="animation-delay: 0.25s;">⭐</span>
+                <span class="star-item" style="animation-delay: 0.4s;">⭐</span>
+            `;
+            rewardSubtitle.innerText = t.rewardPerfectSub;
+
+            if (!alreadyClaimed) {
+                userStars += 3;
+                localStorage.setItem('pisa_stars', userStars);
+                localStorage.setItem(LESSON_ID + '_claimed', '3_stars');
+            }
+        } else {
+            rewardTitle.innerText = t.rewardEffortTitle;
+            rewardStarsRow.innerHTML = `
+                <span class="star-item" style="animation-delay: 0.1s;">⭐</span>
+                <span class="star-item" style="animation-delay: 0.25s;">⭐</span>
+                <span style="opacity: 0.3; filter: grayscale(1);">⭐</span>
+            `;
+            rewardSubtitle.innerText = t.rewardEffortSub;
+
+            if (!alreadyClaimed) {
+                userStars += 2;
+                localStorage.setItem('pisa_stars', userStars);
+                localStorage.setItem(LESSON_ID + '_claimed', '2_stars');
+            }
+        }
+
+        rewardCoinsEarned.innerText = userStars + " ⭐";
+        updateStudentDisplay();
+        rewardModal.style.display = 'flex';
+    }
+
+    function retryThisLesson() {
+        document.getElementById('rewardModal').style.display = 'none';
+        currentSet = '';
+        currentSubStep = 1;
+        tabSwitchCount = 0;
+        playIntroVideo();
+    }
+
+    function closeRewardToHome() {
+        document.getElementById('rewardModal').style.display = 'none';
+        backToMenu();
+    }
+
+    const audioTrue = document.getElementById('soundTrue');
+    const audioFalse = document.getElementById('soundFalse');
+
+    function playResultSound(isCorrect) {
+        if (isCorrect) { 
+            audioTrue.currentTime = 0; 
+            audioTrue.play().catch(() => {}); 
+        } else { 
+            audioFalse.currentTime = 0; 
+            audioFalse.play().catch(() => {}); 
+        }
+    }
+
+    let audioCtx;
+    function playClickSound() {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+
+            gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.09);
+        } catch (e) {}
+    }
+
+    document.addEventListener('pointerdown', function (e) {
+        const button = e.target.closest('.sound-btn');
+        if (!button) return;
+
+        if (!button.classList.contains('btn-choice')) playClickSound();
+
+        const circle = document.createElement('span');
+        const diameter = Math.max(button.clientWidth, button.clientHeight);
+        const radius = diameter / 2;
+        const rect = button.getBoundingClientRect();
+
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${e.clientX - rect.left - radius}px`;
+        circle.style.top = `${e.clientY - rect.top - radius}px`;
+        circle.classList.add('ripple');
+
+        const ripple = button.getElementsByClassName('ripple')[0];
+        if (ripple) ripple.remove();
+        button.appendChild(circle);
+    });
+
+    function lockVideoSeeking(videoElement) {
+        let maxTimeWatched = 0;
+        videoElement.addEventListener('timeupdate', function () {
+            if (!videoElement.seeking && videoElement.currentTime > maxTimeWatched) {
+                maxTimeWatched = videoElement.currentTime;
+            }
+        });
+        videoElement.addEventListener('seeking', function () {
+            if (videoElement.currentTime > maxTimeWatched) {
+                videoElement.currentTime = maxTimeWatched;
+            }
+        });
+        videoElement.addEventListener('play', function () {
+            if (videoElement.currentTime === 0) maxTimeWatched = 0;
+        });
+    }
+
+    const startScreen = document.getElementById('startScreen');
+    const introPlayerContainer = document.getElementById('introPlayerContainer');
+    const introVideo = document.getElementById('introVideo');
+    const introVideoSrc = document.getElementById('introVideoSrc');
+    const mainQuizCard = document.getElementById('mainQuizCard');
+    const subQuizCard = document.getElementById('subQuizCard');
+
+    const videoModal = document.getElementById('videoModal');
+    const modalVideo = document.getElementById('modalVideo');
+    const modalVideoSrc = document.getElementById('modalVideoSrc');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalExp = document.getElementById('modalExp');
+    const modalActionBtn = document.getElementById('modalActionBtn');
+
+    lockVideoSeeking(introVideo);
+    lockVideoSeeking(modalVideo);
+
+    let currentSet = '';
+    let currentSubStep = 1;
+
+    function playIntroVideo() {
+        firstTryCorrect = true;
+        tabSwitchCount = 0;
+        startScreen.style.display = 'none';
+        introPlayerContainer.style.display = 'block';
+
+        const isMobile = window.innerWidth <= 768 || window.matchMedia("(orientation: portrait)").matches;
+        introVideoSrc.src = isMobile ? 'videos/intro_mobile.mp4' : 'videos/intro.mp4';
+        introVideo.load();
+        introVideo.play().catch(() => {
+            introPlayerContainer.style.display = 'none';
+            mainQuizCard.style.display = 'block';
+        });
+    }
+
+    introVideo.addEventListener('ended', function() {
+        introPlayerContainer.style.display = 'none';
+        mainQuizCard.style.display = 'block';
+    });
+
+    function selectMainChoice(choice) {
+        if (choice === 'A') {
+            playResultSound(true);
+            const isTh = currentLang === 'th';
+            openExplanationModal({
+                videoFile: 'videos/ending_A.mp4',
+                isCorrect: true,
+                title: isTh ? "✅ ถูกต้องยอดเยี่ยม! (ตอบข้อ ก)" : "✅ Outstanding! (Option A)",
+                exp: isTh 
+                    ? "เนื่องจากความร้อนถ่ายโอนจากอุณหภูมิสูงไปต่ำ กาแฟจึงเย็นลง และน้ำแร่จะอุ่นขึ้น แต่เวลา 10 นาทียังไม่เพียงพอที่จะปรับจนเท่ากับอุณหภูมิห้อง (20°C)"
+                    : "Because thermal energy transfers from hot to cold, coffee cools and mineral water warms. However, 10 minutes is not enough to reach equilibrium (20°C).",
+                btnText: isTh ? "รับรางวัล 🏆" : "Claim Reward 🏆",
+                action: 'finish_lesson'
+            });
+        } else {
+            firstTryCorrect = false;
+            playResultSound(false);
+            if (choice === 'B') startSubQuestions('SET_B');
+            else if (choice === 'C') startSubQuestions('SET_C');
+            else if (choice === 'D') startSubQuestions('SET_D');
+        }
+    }
+
+    function startSubQuestions(set) {
+        currentSet = set;
+        currentSubStep = 1;
+        mainQuizCard.style.display = 'none';
+        subQuizCard.style.display = 'block';
+        renderSubQuestion();
+    }
+
+    function renderSubQuestion() {
+        const badge = document.getElementById('subBadgeText');
+        const intro = document.getElementById('subTopicIntro');
+        const qText = document.getElementById('subQuestionText');
+        const isTh = currentLang === 'th';
+
+        badge.innerText = isTh ? "ลองวิเคราะห์อีกครั้ง" : "Analyze Again";
+
+        if (currentSet === 'SET_B') {
+            intro.innerText = isTh 
+                ? '"แม้ไม่มีใครแตะต้องเครื่องดื่ม แต่ในช่วง 10 นาทีที่ผ่านมา ข้อใดน่าจะเกิดขึ้น? (ตอบ ใช่ / ไม่ใช่)"'
+                : '"Even if untouched, what likely occurred over the past 10 minutes? (Yes / No)"';
+            if (currentSubStep === 1) {
+                qText.innerText = isTh 
+                    ? "1. กาแฟยังคง 90°C และน้ำแร่ยังคง 5°C เพราะไม่มีใครแตะต้อง"
+                    : "1. Coffee remains 90°C and water remains 5°C because nobody touched them.";
+            } else if (currentSubStep === 2) {
+                qText.innerText = isTh 
+                    ? "2. น้ำแร่จะมีอุณหภูมิสูงขึ้นจากเดิม เพราะได้รับความร้อนจากอากาศในห้องที่อุ่นกว่า"
+                    : "2. Mineral water warms up because it absorbs heat from the warmer room air.";
+            } else if (currentSubStep === 3) {
+                qText.innerText = isTh 
+                    ? "3. กาแฟจะมีอุณหภูมิลดลงจากเดิม เพราะคายความร้อนสู่อากาศ"
+                    : "3. Coffee cools down because it releases heat into the surrounding air.";
+            }
+        } else if (currentSet === 'SET_C') {
+            intro.innerText = isTh 
+                ? '"ถ้าเหตุการณ์ทั้งหมดเป็นจริง ข้อใดอธิบายได้ดีที่สุดว่า ทำไมคำตอบ 70°C และ 25°C จึงมีปัญหา? (ตอบ ใช่ / ไม่ใช่)"'
+                : '"If everything occurred naturally, why is 70°C and 25°C problematic? (Yes / No)"';
+            if (currentSubStep === 1) {
+                qText.innerText = isTh 
+                    ? "ก. กาแฟสามารถเย็นลงได้เมื่ออยู่ในห้องที่เย็นกว่า"
+                    : "A. Coffee can cool down when placed in a cooler room.";
+            } else if (currentSubStep === 2) {
+                qText.innerText = isTh 
+                    ? "ข. น้ำแร่ควรได้รับความร้อนจากอากาศในห้อง"
+                    : "B. Mineral water should absorb heat from the surrounding room.";
+            } else if (currentSubStep === 3) {
+                qText.innerText = isTh 
+                    ? "ค. หากไม่มีแหล่งความร้อนอื่น น้ำแร่ไม่ควรมีอุณหภูมิสูงกว่าห้องถึง 25°C"
+                    : "C. Without another heat source, water cannot naturally heat up above room temp (25°C).";
+            }
+        } else if (currentSet === 'SET_D') {
+            intro.innerText = isTh 
+                ? '"ถ้าปิติกลับมาแล้วพบว่ากาแฟและน้ำแร่มีอุณหภูมิ 20°C เท่ากับห้องทั้งคู่ เขาควรสงสัยอะไร? (ตอบ ใช่ / ไม่ใช่)"'
+                : '"If Piti found both beverages at 20°C matching the room, what should he question? (Yes / No)"';
+            if (currentSubStep === 1) {
+                qText.innerText = isTh 
+                    ? "ก. เครื่องดื่มทุกชนิดจะมีอุณหภูมิเท่ากับห้องทันทีที่วางไว้"
+                    : "A. All beverages instantly match room temperature as soon as they are placed.";
+            } else if (currentSubStep === 2) {
+                qText.innerText = isTh 
+                    ? "ข. อุณหภูมิของเครื่องดื่มมีแนวโน้มเข้าใกล้อุณหภูมิห้องเมื่อเวลาผ่านไป"
+                    : "B. Beverage temperatures tend to approach room temperature over time.";
+            } else if (currentSubStep === 3) {
+                qText.innerText = isTh 
+                    ? "ค. เวลา 10 นาทีอาจยังไม่เพียงพอสำหรับเครื่องดื่มทั้งสองชนิดที่จะมีอุณหภูมิเท่ากับห้องพอดี"
+                    : "C. 10 minutes is likely insufficient for both drinks to reach full equilibrium.";
+            }
+        }
+    }
+
+    function answerSubQuestion(userAnswer) {
+        const isTh = currentLang === 'th';
+        if (currentSet === 'SET_B') {
+            if (currentSubStep === 1) {
+                const isCorrect = (userAnswer === false);
+                playResultSound(isCorrect);
+                openExplanationModal({
+                    videoFile: 'videos/sub_exp1.mp4',
+                    isCorrect: isCorrect,
+                    title: isCorrect ? (isTh ? "✅ ถูกต้อง! (ตอบ ไม่ใช่)" : "✅ Correct! (No)") : (isTh ? "❌ ยังไม่ถูกต้อง (ตอบ ใช่)" : "❌ Incorrect (Yes)"),
+                    exp: isTh ? "ถึงแม้ไม่มีใครแตะต้อง แต่ความร้อนจะถ่ายโอนกับอากาศในห้องตลอดเวลา ทำให้อุณหภูมิไม่เท่าเดิมแน่นอน" : "Even if untouched, heat transfers with room air continuously, so temperatures definitely change.",
+                    btnText: isTh ? "ไปข้อ 2 ต่อไป ➡️" : "Next Question ➡️",
+                    action: 'go_step2'
+                });
+            } else if (currentSubStep === 2) {
+                const isCorrect = (userAnswer === true);
+                playResultSound(isCorrect);
+                openExplanationModal({
+                    videoFile: 'videos/sub_exp2.mp4',
+                    isCorrect: isCorrect,
+                    title: isCorrect ? (isTh ? "✅ ถูกต้อง! (ตอบ ใช่)" : "✅ Correct! (Yes)") : (isTh ? "❌ ยังไม่ถูกต้อง (ตอบ ไม่ใช่)" : "❌ Incorrect (No)"),
+                    exp: isTh ? "น้ำแร่อุณหภูมิ 5°C อยู่ในห้อง 20°C ความร้อนจากอากาศจะถ่ายโอนเข้าสู่น้ำแร่ ทำให้อุณหภูมิสูงขึ้น" : "Cold water at 5°C in a 20°C room absorbs heat from the air, causing its temperature to rise.",
+                    btnText: isTh ? "ไปข้อ 3 ต่อไป ➡️" : "Next Question ➡️",
+                    action: 'go_step3'
+                });
+            } else if (currentSubStep === 3) {
+                const isCorrect = (userAnswer === true);
+                playResultSound(isCorrect);
+                openExplanationModal({
+                    videoFile: 'videos/sub_exp3.mp4',
+                    isCorrect: isCorrect,
+                    title: isCorrect ? (isTh ? "✅ ถูกต้อง! (ตอบ ใช่)" : "✅ Correct! (Yes)") : (isTh ? "❌ ยังไม่ถูกต้อง (ตอบ ไม่ใช่)" : "❌ Incorrect (No)"),
+                    exp: isTh ? "กาแฟร้อน (90°C) สูงกว่าอุณหภูมิห้อง (20°C) ความร้อนจึงถ่ายโอนออกจากกาแฟสู่อากาศ ทำให้กาแฟเย็นลง" : "Hot coffee at 90°C releases heat into cooler room air (20°C), cooling it down.",
+                    btnText: isTh ? "รับรางวัล 🏆" : "Claim Reward 🏆",
+                    action: 'finish_lesson'
+                });
+            }
+        } else if (currentSet === 'SET_C') {
+            if (currentSubStep === 1) {
+                const isCorrect = (userAnswer === true);
+                playResultSound(isCorrect);
+                openExplanationModal({
+                    videoFile: 'videos/sub_c1.mp4',
+                    isCorrect: isCorrect,
+                    title: isCorrect ? (isTh ? "✅ ถูกต้อง! (ตอบ ใช่)" : "✅ Correct! (Yes)") : (isTh ? "❌ ยังไม่ถูกต้อง (ตอบ ไม่ใช่)" : "❌ Incorrect (No)"),
+                    exp: isTh ? "ถูกต้องครับ! กาแฟ 90°C ในห้อง 20°C ย่อมเย็นลงมาที่ 70°C ได้ตามปกติ" : "Correct! 90°C coffee in a 20°C room can naturally cool down to 70°C.",
+                    btnText: isTh ? "ไปข้อ ข ต่อไป ➡️" : "Next Question ➡️",
+                    action: 'go_step2'
+                });
+            } else if (currentSubStep === 2) {
+                const isCorrect = (userAnswer === true);
+                playResultSound(isCorrect);
+                openExplanationModal({
+                    videoFile: 'videos/sub_c2.mp4',
+                    isCorrect: isCorrect,
+                    title: isCorrect ? (isTh ? "✅ ถูกต้อง! (ตอบ ใช่)" : "✅ Correct! (Yes)") : (isTh ? "❌ ยังไม่ถูกต้อง (ตอบ ไม่ใช่)" : "❌ Incorrect (No)"),
+                    exp: isTh ? "ถูกต้องครับ! น้ำแร่เย็น (5°C) ควรรับความร้อนจากห้องและอุณหภูมิค่อยๆ สูงขึ้น" : "Correct! Cold water (5°C) absorbs room heat and gradually warms up.",
+                    btnText: isTh ? "ไปข้อ ค ต่อไป ➡️" : "Next Question ➡️",
+                    action: 'go_step3'
+                });
+            } else if (currentSubStep === 3) {
+                const isCorrect = (userAnswer === true);
+                playResultSound(isCorrect);
+                openExplanationModal({
+                    videoFile: 'videos/sub_c3.mp4',
+                    isCorrect: isCorrect,
+                    title: isCorrect ? (isTh ? "✅ ถูกต้อง! (ตอบ ใช่)" : "✅ Correct! (Yes)") : (isTh ? "❌ ยังไม่ถูกต้อง (ตอบ ไม่ใช่)" : "❌ Incorrect (No)"),
+                    exp: isTh ? "นี่คือสาเหตุที่ผิดครับ! น้ำแร่ไม่สามารถรับความร้อนจนอุณหภูมิสูงเกินห้อง (25°C) ได้เองโดยไม่มีแหล่งความร้อนอื่น" : "This is why it's flawed! Water cannot heat beyond room temp (25°C) without external heat.",
+                    btnText: isTh ? "รับรางวัล 🏆" : "Claim Reward 🏆",
+                    action: 'finish_lesson'
+                });
+            }
+        } else if (currentSet === 'SET_D') {
+            if (currentSubStep === 1) {
+                const isCorrect = (userAnswer === false);
+                playResultSound(isCorrect);
+                openExplanationModal({
+                    videoFile: 'videos/sub_d1.mp4',
+                    isCorrect: isCorrect,
+                    title: isCorrect ? (isTh ? "✅ ถูกต้อง! (ตอบ ไม่ใช่)" : "✅ Correct! (No)") : (isTh ? "❌ ยังไม่ถูกต้อง (ตอบ ใช่)" : "❌ Incorrect (Yes)"),
+                    exp: isTh ? "การถ่ายโอนความร้อนต้องใช้เวลา ไม่สามารถปรับเท่ากับห้องได้ทันทีที่วางไว้ครับ" : "Heat transfer requires time; beverages do not instantly match room temperature.",
+                    btnText: isTh ? "ไปข้อ ข ต่อไป ➡️" : "Next Question ➡️",
+                    action: 'go_step2'
+                });
+            } else if (currentSubStep === 2) {
+                const isCorrect = (userAnswer === true);
+                playResultSound(isCorrect);
+                openExplanationModal({
+                    videoFile: 'videos/sub_d2.mp4',
+                    isCorrect: isCorrect,
+                    title: isCorrect ? (isTh ? "✅ ถูกต้อง! (ตอบ ใช่)" : "✅ Correct! (Yes)") : (isTh ? "❌ ยังไม่ถูกต้อง (ตอบ ไม่ใช่)" : "❌ Incorrect (No)"),
+                    exp: isTh ? "ถูกต้องครับ! เมื่อเวลาผ่านไป วัตถุจะเกิดการถ่ายโอนความร้อนจนมีแนวโน้มเข้าใกล้อุณหภูมิห้อง" : "Correct! Over time, thermal transfer causes drinks to approach room temperature.",
+                    btnText: isTh ? "ไปข้อ ค ต่อไป ➡️" : "Next Question ➡️",
+                    action: 'go_step3'
+                });
+            } else if (currentSubStep === 3) {
+                const isCorrect = (userAnswer === true);
+                playResultSound(isCorrect);
+                openExplanationModal({
+                    videoFile: 'videos/sub_d3.mp4',
+                    isCorrect: isCorrect,
+                    title: isCorrect ? (isTh ? "✅ ถูกต้อง! (ตอบ ใช่)" : "✅ Correct! (Yes)") : (isTh ? "❌ ยังไม่ถูกต้อง (ตอบ ไม่ใช่)" : "❌ Incorrect (No)"),
+                    exp: isTh ? "ถูกต้องที่สุดครับ! เวลาเพียง 10 นาทียังสั้นเกินไปที่จะทำให้ทั้งกาแฟร้อนและน้ำแร่เย็นปรับจนเข้าสู่สมดุลความร้อนที่ 20°C พอดี" : "Exactly! 10 minutes is too short to reach complete thermal equilibrium at 20°C.",
+                    btnText: isTh ? "รับรางวัล 🏆" : "Claim Reward 🏆",
+                    action: 'finish_lesson'
+                });
+            }
+        }
+    }
+
+    let nextModalAction = '';
+    function openExplanationModal({ videoFile, isCorrect, title, exp, btnText, action }) {
+        modalTitle.innerText = title;
+        modalTitle.className = "modal-result-title " + (isCorrect ? "correct" : "wrong");
+        modalExp.innerText = exp;
+        modalActionBtn.innerText = btnText;
+        nextModalAction = action;
+
+        modalVideoSrc.src = videoFile;
+        modalVideo.load();
+        modalVideo.play().catch(() => {});
+
+        videoModal.style.display = 'flex';
+    }
+
+    function handleModalNext() {
+        modalVideo.pause();
+        videoModal.style.display = 'none';
+
+        if (nextModalAction === 'go_step2') {
+            currentSubStep = 2;
+            renderSubQuestion();
+        } else if (nextModalAction === 'go_step3') {
+            currentSubStep = 3;
+            renderSubQuestion();
+        } else if (nextModalAction === 'finish_lesson') {
+            showRewardModal(firstTryCorrect);
+        } else if (nextModalAction === 'back_home') {
+            backToMenu();
+        }
+    }
+
+    function backToMenu() {
+        introVideo.pause();
+        modalVideo.pause();
+        introPlayerContainer.style.display = 'none';
+        videoModal.style.display = 'none';
+        subQuizCard.style.display = 'none';
+        mainQuizCard.style.display = 'none';
+        document.getElementById('rewardModal').style.display = 'none';
+        document.getElementById('simModal').style.display = 'none';
+        document.getElementById('cheatModal').style.display = 'none';
+        document.getElementById('loginModal').style.display = 'none';
+        currentSet = '';
+        currentSubStep = 1;
+        startScreen.style.display = 'flex';
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        checkAuthStatus();
+    });
+</script>
+
+</body>
+</html>

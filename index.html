@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PISA SPARK - เลือกวิชา</title>
+
+    <!-- ฟอนต์ Mali -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- นำเข้า SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-image: url('img/bg3.png');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            font-family: 'Mali', cursive, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ปรับแต่ง SweetAlert2 */
+        .swal2-popup {
+            font-family: 'Mali', cursive, sans-serif !important;
+            border-radius: 28px !important;
+            border: 4px solid #222222 !important;
+            box-shadow: 8px 8px 0px #222222 !important;
+        }
+        .swal2-title {
+            font-family: 'Mali', cursive, sans-serif !important;
+            font-weight: 800 !important;
+        }
+
+        /* แถบปุ่มควบคุมด้านบนซ้าย */
+        .top-left-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .student-badge {
+            background: #10b981;
+            border: 3px solid #ffffff;
+            color: #ffffff;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+        .student-badge:hover { transform: scale(1.04); }
+
+        .btn-logout {
+            background: #ef4444;
+            border: 3px solid #ffffff;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 4px;
+            transition: transform 0.1s ease;
+        }
+        .btn-logout:hover { transform: scale(1.04); background: #dc2626; }
+        .btn-logout:active { transform: translateY(2px); }
+
+        /* แถบปุ่มควบคุมด้านบนขวา */
+        .top-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .circle-btn {
+            position: relative;
+            overflow: hidden;
+            width: 55px;
+            height: 55px;
+            background: #ffffff;
+            border: 3.5px solid #222222;
+            border-radius: 50%;
+            box-shadow: 0 4px 0 #222222, 0 6px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            cursor: pointer;
+            outline: none;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.15s ease;
+            user-select: none;
+            color: #222222;
+            text-decoration: none;
+        }
+
+        .lang-btn {
+            background: radial-gradient(circle at 35% 30%, #fff176 0%, #fbc02d 60%, #f57f17 100%);
+            border-color: #5d3900;
+            box-shadow: 0 4px 0 #5d3900, 0 6px 10px rgba(0, 0, 0, 0.2);
+            color: #4a2800;
+            font-size: 18px;
+        }
+
+        .circle-btn:hover { transform: scale(1.08) translateY(-2px); }
+        .circle-btn:active { transform: translateY(3px) scale(0.95) !important; box-shadow: 0 1px 0 #222222 !important; }
+
+        /* กล่องแจ้งเตือนก่อนล็อกอิน */
+        .login-prompt-banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.92);
+            border: 4px solid #222;
+            border-radius: 30px;
+            padding: 24px 30px;
+            text-align: center;
+            box-shadow: 8px 8px 0px #222;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            max-width: 420px;
+            width: 90%;
+            animation: bounceIn 0.5s ease-out;
+        }
+
+        .btn-main-login {
+            background: #10b981;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            padding: 12px 30px;
+            border-radius: 40px;
+            border: 3px solid #222;
+            box-shadow: 0 5px 0 #222;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-main-login:hover { transform: scale(1.05); background: #059669; }
+        .btn-main-login:active { transform: translateY(3px); box-shadow: 0 1px 0 #222; }
+
+        /* คอนเทนเนอร์ปุ่มหมวดวิชา */
+        .category-container {
+            position: absolute;
+            bottom: 6vh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 20;
+            width: 90%;
+            max-width: 900px;
+            flex-wrap: wrap;
+            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popUp {
+            0% { opacity: 0; transform: translate(-50%, 40px) scale(0.9); }
+            100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .subject-btn {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            padding: 14px 26px;
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            border: 4px solid #ffffff;
+            border-radius: 50px;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: all 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+            flex: 1;
+            min-width: 220px;
+            max-width: 270px;
+        }
+
+        .btn-science {
+            background: linear-gradient(180deg, #2ed573 0%, #10ac84 100%);
+            box-shadow: 0 8px 0 #0a6950, 0 12px 16px rgba(0, 0, 0, 0.35);
+        }
+
+        .btn-math {
+            background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+            box-shadow: 0 8px 0 #1c5982, 0 12px 16px rgba(0, 0, 0, 0.35);
+        }
+
+        .btn-reading {
+            background: linear-gradient(180deg, #ff7675 0%, #d63031 100%);
+            box-shadow: 0 8px 0 #8b1d1e, 0 12px 16px rgba(0, 0, 0, 0.35);
+        }
+
+        .subject-btn:hover { transform: translateY(-4px) scale(1.04); }
+        .subject-btn:active { transform: translateY(6px) scale(0.97) !important; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.6), 0 4px 6px rgba(0, 0, 0, 0.2) !important; }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: rippleEffect 0.5s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
+
+        .icon { font-size: 26px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)); }
+
+        /* Modal ฟอร์มล็อกอิน */
+        .login-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.88);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+            padding: 15px;
+            backdrop-filter: blur(8px);
+        }
+
+        .login-card {
+            background: #ffffff;
+            color: #1e293b;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 28px;
+            border: 4px solid #0f172a;
+            padding: 30px 24px;
+            box-shadow: 10px 10px 0px #0f172a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            text-align: center;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .login-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #fee2e2;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .login-title { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+
+        .input-group { width: 100%; margin-top: 14px; text-align: left; }
+        .input-group label { font-size: 0.92rem; font-weight: 800; color: #475569; margin-bottom: 5px; display: block; }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 2.5px solid #222;
+            font-size: 1.05rem;
+            font-weight: 700;
+            outline: none;
+            text-align: center;
+            transition: all 0.15s ease;
+        }
+        .input-field:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+        .btn-submit-login {
+            margin-top: 20px;
+            width: 100%;
+            background: #10b981;
+            color: #ffffff;
+            border: 3px solid #222;
+            border-radius: 18px;
+            padding: 12px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #222;
+            transition: all 0.15s ease;
+        }
+        .btn-submit-login:active { transform: translateY(3px); box-shadow: 0 1px 0 #222; }
+
+        @media screen and (max-width: 768px) {
+            body { background-image: url('img/bg-mobile.png'); background-position: center center; }
+            .top-left-controls { top: 12px; left: 12px; gap: 6px; }
+            .top-controls { top: 12px; right: 12px; gap: 6px; }
+            .student-badge, .btn-logout { padding: 4px 10px; font-size: 0.8rem; }
+            .circle-btn { width: 44px; height: 44px; font-size: 18px; }
+            .lang-btn { font-size: 14px; }
+            .category-container { bottom: 5vh; width: 88%; gap: 8px; }
+            .subject-btn { padding: 10px 14px; font-size: 16px; min-width: 100%; border-width: 3px; }
+            .icon { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- แถบด้านบนซ้าย: ข้อมูลนักเรียน + ปุ่มออกจากระบบ -->
+    <div class="top-left-controls">
+        <div class="student-badge" id="studentDisplay" onclick="openLoginModal()" title="คลิกเพื่อเข้าสู่ระบบ/แก้ไขข้อมูล">
+            <span>👤</span>
+            <span id="studentNameText">เข้าสู่ระบบ</span>
+        </div>
+        <button class="btn-logout" id="logoutBtn" onclick="logoutStudent()" title="ออกจากระบบ">
+            <span>🚪</span>
+            <span id="logoutText">ออก</span>
+        </button>
+    </div>
+
+    <!-- แถบปุ่มควบคุมด้านบนขวา -->
+    <div class="top-controls">
+        <a href="teacher.html" class="circle-btn interactive-btn" title="ระบบสำหรับคุณครู">👨‍🏫</a>
+        <button id="langToggle" class="circle-btn lang-btn interactive-btn" title="เปลี่ยนภาษา / Switch Language">TH</button>
+        <button id="musicToggle" class="circle-btn interactive-btn" title="เปิด/ปิดเสียง">🔊</button>
+    </div>
+
+    <!-- ไฟล์เสียงพื้นหลัง -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="sound/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 1. ป้ายแจ้งเตือนให้เข้าสู่ระบบก่อน (แสดงเมื่อยังไม่ล็อกอิน) -->
+    <div id="loginPromptBanner" class="login-prompt-banner">
+        <div style="font-size: 3.5rem;">🔒</div>
+        <h2 id="promptTitle" style="color: #0f172a; font-size: 1.4rem;">กรุณาเข้าสู่ระบบ</h2>
+        <p id="promptDesc" style="color: #64748b; font-size: 0.95rem;">เข้าสู่ระบบด้วยรหัสนักเรียน เพื่อเริ่มทำแบบฝึกหัดและสะสมดาว</p>
+        <button class="btn-main-login" onclick="openLoginModal()">🔑 เข้าสู่ระบบผู้เรียน</button>
+    </div>
+
+    <!-- 2. ปุ่มเลือกวิชา (จะแสดงขึ้นมาก็ต่อเมื่อเข้าสู่ระบบแล้วเท่านั้น) -->
+    <div id="categoryContainer" class="category-container">
+        <a href="science.html" class="subject-btn btn-science interactive-btn">
+            <span class="icon">🧪</span>
+            <span id="txtScience">วิทยาศาสตร์</span>
+        </a>
+
+        <a href="math.html" class="subject-btn btn-math interactive-btn">
+            <span class="icon">📐</span>
+            <span id="txtMath">คณิตศาสตร์</span>
+        </a>
+
+        <a href="read.html" class="subject-btn btn-reading interactive-btn">
+            <span class="icon">📖</span>
+            <span id="txtReading">การอ่าน</span>
+        </a>
+    </div>
+
+    <!-- 3. Modal ฟอร์มเข้าสู่ระบบ -->
+    <div id="loginModal" class="login-modal-overlay">
+        <div class="login-card">
+            <button class="login-close-btn" onclick="closeLoginModal()">✕</button>
+            <h3 class="login-title" id="modalTitle">🔑 เข้าสู่ระบบผู้เรียน</h3>
+            <p style="font-size: 0.88rem; color: #64748b; margin-top: 4px;" id="modalSubtitle">กรอกรหัสและห้องเรียนเพื่อปลดล็อกรายวิชา</p>
+
+            <div class="input-group">
+                <label for="inpStudentId" id="lblStudentId">รหัสนักเรียน (Student ID):</label>
+                <input type="text" id="inpStudentId" class="input-field" placeholder="เช่น 31216" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label for="inpStudentClass" id="lblStudentClass">ระดับชั้น / ห้อง (Class):</label>
+                <input type="text" id="inpStudentClass" class="input-field" placeholder="เช่น ม.1/5 หรือ ป.6" autocomplete="off">
+            </div>
+
+            <button id="btnLoginSubmit" class="btn-submit-login" onclick="loginWithStudentId()">เข้าสู่ระบบ 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfA4fKhF8ROV4y_TcTbiGJdi9Ei_OJN8iTSGgr_E6r2kWzjma0_VmG5uU3BSz1mKNjpg/exec";
+
+        let currentStudentId = localStorage.getItem('pisa_current_student_id') || '';
+        let currentStudentClass = localStorage.getItem('pisa_current_student_class') || '';
+        let userStars = parseInt(localStorage.getItem('pisa_stars') || '0', 10);
+
+        function updateAuthState() {
+            const promptBanner = document.getElementById('loginPromptBanner');
+            const categoryContainer = document.getElementById('categoryContainer');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const studentText = document.getElementById('studentNameText');
+
+            if (currentStudentId) {
+                promptBanner.style.display = 'none';
+                categoryContainer.style.display = 'flex';
+                logoutBtn.style.display = 'flex';
+                studentText.innerText = `${currentStudentId} (${currentStudentClass || '-'}) | ${userStars} ⭐`;
+            } else {
+                promptBanner.style.display = 'flex';
+                categoryContainer.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                studentText.innerText = currentLang === 'th' ? "เข้าสู่ระบบ" : "Login";
+            }
+        }
+
+        function openLoginModal() {
+            document.getElementById('inpStudentId').value = currentStudentId;
+            document.getElementById('inpStudentClass').value = currentStudentClass;
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        async function loginWithStudentId() {
+            const idInput = document.getElementById('inpStudentId').value.trim();
+            const classInput = document.getElementById('inpStudentClass').value.trim() || "-";
+
+            if (!idInput) {
+                Swal.fire({
+                    title: currentLang === 'th' ? 'กรุณากรอกรหัส' : 'Missing ID',
+                    text: currentLang === 'th' ? 'กรุณากรอกรหัสนักเรียนก่อนเข้าใช้งานครับ' : 'Please enter your student ID.',
+                    icon: 'warning',
+                    confirmButtonText: 'ตกลง',
+                    confirmButtonColor: '#f59e0b'
+                });
+                return;
+            }
+
+            const btnLogin = document.getElementById('btnLoginSubmit');
+            btnLogin.innerText = currentLang === 'th' ? "⏳ กำลังดึงข้อมูล..." : "⏳ Fetching...";
+            btnLogin.disabled = true;
+
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?studentId=${encodeURIComponent(idInput)}&studentClass=${encodeURIComponent(classInput)}`);
+                const res = await response.json();
+
+                if (res.status === 'success') {
+                    currentStudentId = res.studentId;
+                    currentStudentClass = (res.studentClass && res.studentClass !== "-") ? res.studentClass : classInput;
+                    userStars = parseInt(res.stars, 10) || 0;
+
+                    localStorage.setItem('pisa_current_student_id', currentStudentId);
+                    localStorage.setItem('pisa_current_student_class', currentStudentClass);
+                    localStorage.setItem('pisa_stars', userStars);
+
+                    closeLoginModal();
+                    updateAuthState();
+
+                    Swal.fire({
+                        title: currentLang === 'th' ? '🎉 ยินดีต้อนรับ!' : '🎉 Welcome!',
+                        html: currentLang === 'th' 
+                            ? `รหัส <b>${currentStudentId}</b> (ห้อง <b>${currentStudentClass}</b>)<br>มีดาวสะสม: <span style="color: #d97706; font-size: 1.25rem; font-weight: bold;">${userStars} ⭐</span><br><br><b>ปลดล็อกรายวิชาเรียบร้อยแล้ว!</b>`
+                            : `Student ID: <b>${currentStudentId}</b> (Room <b>${currentStudentClass}</b>)<br>Current Stars: <span style="color: #d97706; font-size: 1.25rem; font-weight: bold;">${userStars} ⭐</span>`,
+                        icon: 'success',
+                        confirmButtonText: 'เริ่มเรียนรู้เลย 🚀',
+                        confirmButtonColor: '#10b981'
+                    });
+                } else {
+                    Swal.fire({ title: 'ข้อผิดพลาด', text: res.message, icon: 'error', confirmButtonText: 'ตกลง', confirmButtonColor: '#ef4444' });
+                }
+            } catch (err) {
+                currentStudentId = idInput;
+                currentStudentClass = classInput;
+                localStorage.setItem('pisa_current_student_id', currentStudentId);
+                localStorage.setItem('pisa_current_student_class', currentStudentClass);
+                closeLoginModal();
+                updateAuthState();
+
+                Swal.fire({
+                    title: 'เข้าสู่ระบบ (โหมดออฟไลน์)',
+                    html: `รหัส <b>${currentStudentId}</b> (ห้อง <b>${currentStudentClass}</b>)`,
+                    icon: 'info',
+                    confirmButtonText: 'ตกลง',
+                    confirmButtonColor: '#3b82f6'
+                });
+            } finally {
+                btnLogin.innerText = currentLang === 'th' ? "เข้าสู่ระบบ 🚀" : "Login 🚀";
+                btnLogin.disabled = false;
+            }
+        }
+
+        function logoutStudent() {
+            Swal.fire({
+                title: currentLang === 'th' ? 'ต้องการออกจากระบบหรือไม่?' : 'Are you sure you want to log out?',
+                text: currentLang === 'th' ? 'รายวิชาจะถูกล็อคจนกว่าจะเข้าสู่ระบบใหม่' : 'Subjects will be locked until you log in again.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: currentLang === 'th' ? '🚪 ออกจากระบบ' : 'Log out',
+                cancelButtonText: currentLang === 'th' ? 'ยกเลิก' : 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    currentStudentId = '';
+                    currentStudentClass = '';
+                    userStars = 0;
+                    localStorage.removeItem('pisa_current_student_id');
+                    localStorage.removeItem('pisa_current_student_class');
+                    localStorage.removeItem('pisa_stars');
+                    localStorage.removeItem('pisa_lesson_1_temp_claimed');
+                    
+                    updateAuthState();
+
+                    Swal.fire({
+                        title: currentLang === 'th' ? 'ออกจากระบบสำเร็จ' : 'Logged out',
+                        icon: 'success',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        let audioCtx;
+        function playClickSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.09);
+            } catch (e) {}
+        }
+
+        document.querySelectorAll('.interactive-btn').forEach(button => {
+            button.addEventListener('pointerdown', function (e) {
+                playClickSound();
+
+                const circle = document.createElement('span');
+                const diameter = Math.max(button.clientWidth, button.clientHeight);
+                const radius = diameter / 2;
+                const rect = button.getBoundingClientRect();
+
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${e.clientX - rect.left - radius}px`;
+                circle.style.top = `${e.clientY - rect.top - radius}px`;
+                circle.classList.add('ripple');
+
+                const ripple = button.getElementsByClassName('ripple')[0];
+                if (ripple) ripple.remove();
+                button.appendChild(circle);
+            });
+        });
+
+        const audio = document.getElementById('bgMusic');
+        const toggleBtn = document.getElementById('musicToggle');
+        let isPlaying = false;
+        let isUserMuted = false;
+
+        function playAudio() {
+            if (isUserMuted) return;
+            audio.play().then(() => {
+                isPlaying = true;
+                toggleBtn.textContent = '🔊';
+                removeUnlockListeners();
+            }).catch(() => {
+                isPlaying = false;
+                toggleBtn.textContent = '🔇';
+            });
+        }
+
+        function pauseAudio() {
+            audio.pause();
+            isPlaying = false;
+            toggleBtn.textContent = '🔇';
+        }
+
+        function unlockAudio(e) {
+            if (e.target.closest('#musicToggle') || e.target.closest('.login-modal-overlay') || e.target.closest('.circle-btn')) return;
+            if (!isPlaying && !isUserMuted) playAudio();
+        }
+
+        function removeUnlockListeners() {
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('touchstart', unlockAudio);
+        }
+
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            playAudio();
+            updateAuthState();
+        });
+
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isPlaying) {
+                isUserMuted = true;
+                removeUnlockListeners();
+                pauseAudio();
+            } else {
+                isUserMuted = false;
+                playAudio();
+            }
+        });
+
+        const langBtn = document.getElementById('langToggle');
+        const txtScience = document.getElementById('txtScience');
+        const txtMath = document.getElementById('txtMath');
+        const txtReading = document.getElementById('txtReading');
+        let currentLang = 'th';
+
+        const translations = {
+            th: {
+                science: "วิทยาศาสตร์",
+                math: "คณิตศาสตร์",
+                reading: "การอ่าน",
+                logout: "ออก",
+                promptTitle: "กรุณาเข้าสู่ระบบ",
+                promptDesc: "เข้าสู่ระบบด้วยรหัสนักเรียน เพื่อเริ่มทำแบบฝึกหัดและสะสมดาว",
+                modalTitle: "🔑 เข้าสู่ระบบผู้เรียน",
+                modalSubtitle: "กรอกรหัสและห้องเรียนเพื่อปลดล็อกรายวิชา",
+                lblStudentId: "รหัสนักเรียน (Student ID):",
+                lblStudentClass: "ระดับชั้น / ห้อง (Class):",
+                btnText: "TH"
+            },
+            en: {
+                science: "Science",
+                math: "Mathematics",
+                reading: "Reading",
+                logout: "Logout",
+                promptTitle: "Please Log In",
+                promptDesc: "Log in with student ID to unlock lessons and earn stars",
+                modalTitle: "🔑 Student Login",
+                modalSubtitle: "Enter student ID and class to unlock subjects",
+                lblStudentId: "Student ID:",
+                lblStudentClass: "Class / Room:",
+                btnText: "EN"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'th' ? 'en' : 'th';
+            txtScience.textContent = translations[currentLang].science;
+            txtMath.textContent = translations[currentLang].math;
+            txtReading.textContent = translations[currentLang].reading;
+            document.getElementById('logoutText').textContent = translations[currentLang].logout;
+            document.getElementById('promptTitle').textContent = translations[currentLang].promptTitle;
+            document.getElementById('promptDesc').textContent = translations[currentLang].promptDesc;
+            document.getElementById('modalTitle').textContent = translations[currentLang].modalTitle;
+            document.getElementById('modalSubtitle').textContent = translations[currentLang].modalSubtitle;
+            document.getElementById('lblStudentId').textContent = translations[currentLang].lblStudentId;
+            document.getElementById('lblStudentClass').textContent = translations[currentLang].lblStudentClass;
+            langBtn.textContent = translations[currentLang].btnText;
+            updateAuthState();
+        }
+
+        langBtn.addEventListener('click', toggleLanguage);
+    </script>
+</body>
+</html>

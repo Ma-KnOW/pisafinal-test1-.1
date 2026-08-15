@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PISA Kids - ระบบจัดการคะแนนและตรวจจับการสลับจอสำหรับคุณครู</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Mali', cursive, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .swal2-popup {
+            font-family: 'Mali', cursive, sans-serif !important;
+            border-radius: 28px !important;
+            border: 4px solid #222222 !important;
+            box-shadow: 8px 8px 0px #222222 !important;
+        }
+        .swal2-title {
+            font-family: 'Mali', cursive, sans-serif !important;
+            font-weight: 800 !important;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            padding: 18px 24px;
+            border-radius: 20px;
+            border: 3.5px solid #222;
+            box-shadow: 6px 6px 0px #222;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header-title h1 {
+            font-size: 1.6rem;
+            color: #0f172a;
+        }
+
+        .header-title p {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .btn-back-home {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 14px;
+            border: 2.5px solid #222;
+            box-shadow: 0 4px 0 #222;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+        .btn-back-home:hover { transform: scale(1.03); background: #2563eb; }
+        .btn-back-home:active { transform: translateY(2px); box-shadow: 0 1px 0 #222; }
+
+        /* การ์ดสถิติ 4 ช่อง */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 3px solid #222;
+            border-radius: 18px;
+            padding: 18px 20px;
+            box-shadow: 4px 4px 0 #222;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-card.warning-card {
+            background: #fff1f2;
+            border-color: #e11d48;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+        }
+
+        .stat-info h3 {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .stat-info .stat-num {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .toolbar {
+            background: #ffffff;
+            border: 3px solid #222;
+            border-radius: 18px;
+            padding: 16px 20px;
+            box-shadow: 4px 4px 0 #222;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-input, .class-select {
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 2.5px solid #222;
+            font-size: 0.95rem;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .search-input { flex: 2; }
+        .class-select { flex: 1; background: #fff; cursor: pointer; }
+
+        .btn-refresh {
+            background: #f59e0b;
+            color: white;
+            border: 2.5px solid #222;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #222;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-refresh:active { transform: translateY(2px); box-shadow: 0 1px 0 #222; }
+
+        .table-container {
+            background: #ffffff;
+            border: 3.5px solid #222;
+            border-radius: 20px;
+            box-shadow: 6px 6px 0 #222;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background: #f8fafc;
+            border-bottom: 3px solid #222;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            font-size: 0.95rem;
+            border-bottom: 1.5px solid #e2e8f0;
+        }
+
+        th {
+            font-weight: 800;
+            color: #334155;
+        }
+
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .stars-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #f59e0b;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 800;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1.5px solid #38bdf8;
+        }
+
+        .teacher-auth-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 15px;
+            backdrop-filter: blur(8px);
+        }
+
+        .auth-card {
+            background: #ffffff;
+            border: 4px solid #222;
+            border-radius: 28px;
+            padding: 30px 24px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 8px 8px 0 #222;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 14px;
+            border: 2.5px solid #222;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .auth-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-auth-submit {
+            width: 100%;
+            padding: 12px;
+            background: #10b981;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 14px;
+            border: 2.5px solid #222;
+            box-shadow: 0 4px 0 #222;
+            cursor: pointer;
+        }
+        .btn-auth-submit:active { transform: translateY(2px); box-shadow: 0 1px 0 #222; }
+    </style>
+</head>
+<body>
+
+    <!-- 🔒 หน้าต่างล็อกอินสำหรับคุณครู -->
+    <div id="teacherAuthOverlay" class="teacher-auth-overlay">
+        <div class="auth-card">
+            <div style="font-size: 3.5rem;">👨‍🏫</div>
+            <h2 style="font-size: 1.4rem; color: #0f172a; margin-top: 6px;">ระบบสำหรับคุณครู</h2>
+            <p style="font-size: 0.88rem; color: #64748b; margin-top: 4px;">กรุณากรอกรหัสผ่านเพื่อเข้าสู่แดชบอร์ด</p>
+
+            <input type="password" id="inpTeacherPin" class="auth-input" placeholder="ใส่รหัสผ่านครู (admin)" autofocus onkeydown="if(event.key==='Enter') checkTeacherPin()">
+            <button class="btn-auth-submit" onclick="checkTeacherPin()">เข้าสู่ระบบ 🚀</button>
+            <a href="index.html" style="display: inline-block; margin-top: 14px; color: #64748b; font-size: 0.88rem; text-decoration: none;">⬅ กลับหน้าหลักนักเรียน</a>
+        </div>
+    </div>
+
+    <div class="container" id="dashboardContent" style="display: none;">
+        <!-- Header -->
+        <div class="header-bar">
+            <div class="header-title">
+                <h1>📊 ระบบรายงานคะแนน & ตรวจจับการสลับจอ</h1>
+                <p>ข้อมูลอัปเดตแบบ Real-time จาก Google Sheets</p>
+            </div>
+            <a href="index.html" class="btn-back-home">🏠 หน้ารวมวิชา</a>
+        </div>
+
+        <!-- การ์ดสรุปสถิติ 4 ช่อง -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h3>นักเรียนทั้งหมด</h3>
+                    <div class="stat-num" id="statTotalStudents">0 คน</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-info">
+                    <h3>ดาวสะสมรวมทั้งหมด</h3>
+                    <div class="stat-num" id="statTotalStars" style="color: #d97706;">0 ดวง</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-info">
+                    <h3>ดาวเฉลี่ยต่อคน</h3>
+                    <div class="stat-num" id="statAvgStars" style="color: #2563eb;">0.0</div>
+                </div>
+            </div>
+            <div class="stat-card warning-card">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-info">
+                    <h3 style="color: #be123c;">พบการสลับหน้าจอ</h3>
+                    <div class="stat-num" id="statCheatCount" style="color: #e11d48;">0 คน</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- แถบเครื่องมือค้นหา & กรอง -->
+        <div class="toolbar">
+            <div class="filter-group">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 ค้นหารหัสนักเรียน..." oninput="filterData()">
+                <select id="classFilter" class="class-select" onchange="filterData()">
+                    <option value="">ทุกห้องเรียน</option>
+                </select>
+            </div>
+            <button class="btn-refresh" onclick="loadAllStudentsData()">
+                <span>🔄</span>
+                <span>รีเฟรชข้อมูล</span>
+            </button>
+        </div>
+
+        <!-- ตารางแสดงคะแนน -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 70px; text-align: center;">ลำดับ</th>
+                        <th>รหัสนักเรียน</th>
+                        <th>ระดับชั้น / ห้อง</th>
+                        <th style="text-align: center;">ดาวสะสม</th>
+                        <th>สถานะการแลกคะแนน</th>
+                        <th style="text-align: center;">สลับหน้าจอ</th>
+                        <th>เวลาอัปเดตล่าสุด</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">⏳ กำลังโหลดข้อมูลจาก Google Sheet...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfA4fKhF8ROV4y_TcTbiGJdi9Ei_OJN8iTSGgr_E6r2kWzjma0_VmG5uU3BSz1mKNjpg/exec";
+        const TEACHER_PIN = "admin";
+
+        let allStudents = [];
+
+        function checkTeacherPin() {
+            const pin = document.getElementById('inpTeacherPin').value.trim();
+            
+            if (pin.toLowerCase() === TEACHER_PIN.toLowerCase()) {
+                document.getElementById('teacherAuthOverlay').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+                loadAllStudentsData();
+
+                // อัปเดตข้อมูลอัตโนมัติทุก 10 วินาที
+                setInterval(() => {
+                    loadAllStudentsData(true);
+                }, 10000);
+            } else {
+                Swal.fire({
+                    title: 'รหัสผ่านไม่ถูกต้อง!',
+                    text: 'กรุณากรอกรหัสผ่านสำหรับคุณครูใหม่อีกครั้ง (admin)',
+                    icon: 'error',
+                    confirmButtonText: 'ลองใหม่',
+                    confirmButtonColor: '#ef4444'
+                });
+            }
+        }
+
+        async function loadAllStudentsData(isSilent = false) {
+            const tbody = document.getElementById('studentTableBody');
+            if (!isSilent) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">⏳ กำลังโหลดข้อมูลล่าสุด...</td></tr>`;
+            }
+
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getAllData`);
+                const res = await response.json();
+
+                if (res.status === 'success') {
+                    allStudents = res.data;
+                    updateClassFilterOptions();
+                    filterData();
+                } else if (!isSilent) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444;">❌ โหลดข้อมูลไม่สำเร็จ: ${res.message}</td></tr>`;
+                }
+            } catch (err) {
+                if (!isSilent) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444;">❌ ไม่สามารถเชื่อมต่อ Google Sheet ได้</td></tr>`;
+                }
+            }
+        }
+
+        function renderTable(dataList) {
+            const tbody = document.getElementById('studentTableBody');
+            if (!dataList || dataList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">ไม่พบข้อมูลนักเรียนในตาราง</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = dataList.map((st, index) => {
+                const switchCount = Number(st.tabSwitchCount || 0);
+                const switchBadge = switchCount > 0 
+                    ? `<span style="background:#fee2e2; color:#b91c1c; border:1.5px solid #ef4444; padding:3px 10px; border-radius:10px; font-weight:800;">⚠️ ${switchCount} ครั้ง</span>`
+                    : `<span style="color:#16a34a; font-weight:700;">✅ ปกติ (0)</span>`;
+
+                return `
+                    <tr style="${switchCount > 0 ? 'background-color: #fff1f2;' : ''}">
+                        <td style="text-align: center; font-weight: bold; color: #64748b;">${index + 1}</td>
+                        <td style="font-weight: 800; color: #0f172a;">${st.studentId}</td>
+                        <td><b>${st.studentClass}</b></td>
+                        <td style="text-align: center;">
+                            <span class="stars-pill">⭐ ${st.stars}</span>
+                        </td>
+                        <td><span class="status-badge">${st.status}</span></td>
+                        <td style="text-align: center;">${switchBadge}</td>
+                        <td style="color: #64748b; font-size: 0.88rem;">${st.lastUpdated}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateStats(dataList) {
+            const totalStudents = dataList ? dataList.length : 0;
+            const totalStars = dataList ? dataList.reduce((sum, st) => sum + Number(st.stars || 0), 0) : 0;
+            const avgStars = totalStudents > 0 ? (totalStars / totalStudents).toFixed(1) : 0;
+            
+            // นับจำนวนเด็กที่สลับหน้าจอมากกว่า 0 ครั้ง
+            const cheatCount = dataList ? dataList.filter(st => Number(st.tabSwitchCount || 0) > 0).length : 0;
+
+            document.getElementById('statTotalStudents').innerText = `${totalStudents} คน`;
+            document.getElementById('statTotalStars').innerText = `${totalStars} ดวง`;
+            document.getElementById('statAvgStars').innerText = `${avgStars} ⭐`;
+            document.getElementById('statCheatCount').innerText = `${cheatCount} คน`;
+        }
+
+        function updateClassFilterOptions() {
+            const select = document.getElementById('classFilter');
+            const currentSelected = select.value;
+            const classes = [...new Set(allStudents.map(s => s.studentClass).filter(c => c && c !== "-"))];
+            
+            select.innerHTML = '<option value="">ทุกห้องเรียน</option>' + 
+                classes.map(c => `<option value="${c}" ${c === currentSelected ? 'selected' : ''}>ห้อง ${c}</option>`).join('');
+        }
+
+        function filterData() {
+            const searchText = document.getElementById('searchInput').value.trim().toLowerCase();
+            const selectedClass = document.getElementById('classFilter').value;
+
+            const filtered = allStudents.filter(st => {
+                const matchId = String(st.studentId).toLowerCase().includes(searchText);
+                const matchClass = !selectedClass || st.studentClass === selectedClass;
+                return matchId && matchClass;
+            });
+
+            renderTable(filtered);
+            updateStats(allStudents);
+        }
+    </script>
+</body>
+</html>
